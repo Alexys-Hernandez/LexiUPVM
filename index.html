@@ -1,0 +1,2177 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LexiUPVM - Evaluación Inteligente de Lectura</title>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#f4f6f8;
+      --card:#ffffff;
+      --primary:#5b1f2d;
+      --secondary:#4b5563;
+      --accent:#b08a53;
+      --danger:#b91c1c;
+      --warning:#b45309;
+      --success:#15803d;
+      --border:#d1d5db;
+      --text:#111827;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family:'Atkinson Hyperlegible', Arial, sans-serif;
+      background:linear-gradient(135deg,var(--bg),#f3eadb);
+      color:var(--text);
+      min-height:100vh;
+    }
+
+    .screen{
+      min-height:100vh;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+    }
+
+    .screen.active{display:flex}
+
+    .card{
+      width:100%;
+      max-width:760px;
+      background:var(--card);
+      border-radius:22px;
+      padding:32px;
+      box-shadow:0 20px 60px rgba(15,23,42,.14);
+      border:1px solid rgba(255,255,255,.6);
+    }
+
+    .header{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      margin-bottom:24px;
+    }
+
+    .logo{
+      width:52px;
+      height:52px;
+      border-radius:14px;
+      background:var(--primary);
+      color:white;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:24px;
+      font-weight:700;
+    }
+
+    h1,h2,h3{margin:0;color:var(--primary)}
+    p{line-height:1.6;color:var(--secondary)}
+
+    label{
+      display:block;
+      margin:14px 0 6px;
+      font-weight:700;
+      color:#374151;
+    }
+
+    input,select{
+      width:100%;
+      padding:14px;
+      font-size:17px;
+      border:2px solid var(--border);
+      border-radius:12px;
+      outline:none;
+      background:white;
+    }
+
+    input:focus,select:focus{border-color:var(--primary)}
+
+    .grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:16px;
+    }
+
+    .btn{
+      border:none;
+      border-radius:14px;
+      padding:15px 20px;
+      font-size:17px;
+      font-weight:700;
+      cursor:pointer;
+      margin-top:18px;
+      transition:.2s;
+    }
+
+    .btn-primary{
+      background:var(--primary);
+      color:white;
+      width:100%;
+    }
+
+    .btn-primary:hover{filter:brightness(.95);transform:translateY(-1px)}
+
+    .btn-secondary{
+      background:#e5e7eb;
+      color:#111827;
+      width:100%;
+    }
+
+    .topbar{
+      width:100%;
+      max-width:960px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:18px;
+      color:#374151;
+      font-weight:700;
+    }
+
+    .game-wrap{
+      width:100%;
+      max-width:960px;
+    }
+
+    .progress{
+      height:12px;
+      background:#e5e7eb;
+      border-radius:999px;
+      overflow:hidden;
+      margin:18px 0;
+    }
+
+    .progress > div{
+      height:100%;
+      width:0%;
+      background:var(--accent);
+      transition:.25s;
+    }
+
+    .timer{
+      font-size:22px;
+      color:var(--primary);
+    }
+
+    .test-word{
+      font-size:42px;
+      letter-spacing:2px;
+      text-align:center;
+      padding:30px 10px;
+      border:2px dashed var(--border);
+      border-radius:18px;
+      background:#f9fafb;
+      margin:18px 0;
+      font-weight:700;
+    }
+
+    .options{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:14px;
+    }
+
+    .option{
+      padding:18px;
+      border:2px solid var(--border);
+      border-radius:14px;
+      background:white;
+      font-size:20px;
+      font-weight:700;
+      cursor:pointer;
+    }
+
+    .option:hover{
+      border-color:var(--primary);
+      background:#f3f7fb;
+    }
+
+    .small{
+      font-size:14px;
+      color:#6b7280;
+    }
+
+    .result-box{
+      padding:18px;
+      border-radius:16px;
+      background:#f9fafb;
+      border:1px solid var(--border);
+      margin:12px 0;
+    }
+
+    .risk-bajo{color:var(--success)}
+    .risk-medio{color:var(--warning)}
+    .risk-alto{color:var(--danger)}
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:14px;
+      font-size:15px;
+    }
+
+    th,td{
+      border-bottom:1px solid #e5e7eb;
+      padding:10px;
+      text-align:left;
+    }
+
+    th{color:var(--primary)}
+
+    .child-theme{
+      --bg:#fff7ed;
+      --primary:#5b1f2d;
+      --accent:#b08a53;
+    }
+
+    .teen-theme{
+      --bg:#f7f0e8;
+      --primary:#5b1f2d;
+      --accent:#b08a53;
+    }
+
+    .adult-theme{
+      --bg:#f4f6f8;
+      --primary:#5b1f2d;
+      --accent:#b08a53;
+    }
+
+    .young-theme{
+      --bg:#f7f3ed;
+      --primary:#5b1f2d;
+      --accent:#b08a53;
+      font-size:17px;
+    }
+
+
+
+    .reading-text{
+      font-size:20px;
+      line-height:1.8;
+      background:#f9fafb;
+      border:2px solid var(--border);
+      border-radius:16px;
+      padding:22px;
+      margin:16px 0;
+      min-height:170px;
+      outline:none;
+      white-space:pre-wrap;
+    }
+
+    .reading-text:focus{
+      border-color:var(--primary);
+      background:#ffffff;
+    }
+
+    .fix-row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+      align-items:center;
+      margin:10px 0;
+    }
+
+    .fix-word{
+      font-weight:700;
+      color:var(--danger);
+      background:#fee2e2;
+      padding:10px;
+      border-radius:10px;
+    }
+
+
+    .image-support{
+      display:none;
+      grid-template-columns:repeat(3,1fr);
+      gap:12px;
+      margin:16px 0;
+    }
+
+    .image-card{
+      background:#fff7ed;
+      border:2px solid #fed7aa;
+      border-radius:16px;
+      padding:14px;
+      text-align:center;
+      font-weight:700;
+      color:#9a3412;
+    }
+
+    .image-card .emoji{
+      display:block;
+      font-size:42px;
+      margin-bottom:8px;
+    }
+
+    .question-box{
+      margin:16px 0;
+      padding:16px;
+      border-radius:16px;
+      border:1px solid var(--border);
+      background:#ffffff;
+    }
+
+
+    .section-score{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:10px;
+      align-items:center;
+      padding:12px;
+      border:1px solid #eadfcb;
+      border-radius:14px;
+      margin:10px 0;
+      background:#fffdf8;
+    }
+
+    .support-panel{
+      margin:14px 0;
+      padding:16px;
+      border:1px solid var(--border);
+      border-left:6px solid var(--accent);
+      border-radius:16px;
+      background:#fffdf8;
+    }
+
+    .exercise-item{
+      padding:14px;
+      border-radius:14px;
+      background:#ffffff;
+      border:1px solid #e5e7eb;
+      margin:12px 0;
+    }
+
+    .exercise-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+
+    .mini-btn{
+      border:none;
+      border-radius:10px;
+      padding:10px 14px;
+      font-weight:700;
+      cursor:pointer;
+      background:var(--accent);
+      color:white;
+    }
+
+    .mini-btn.secondary{
+      background:#e5e7eb;
+      color:#111827;
+    }
+
+    .daily-checklist label{
+      font-weight:400;
+      display:flex;
+      gap:8px;
+      align-items:flex-start;
+      margin:10px 0;
+    }
+
+    .daily-checklist input{
+      width:auto;
+      margin-top:4px;
+    }
+
+    .feedback{
+      margin-top:10px;
+      font-weight:700;
+    }
+
+    @media(max-width:700px){
+      .grid,.options,.fix-row{grid-template-columns:1fr}
+      .card{padding:24px}
+      .test-word{font-size:34px}
+      .topbar{flex-direction:column;gap:8px;align-items:flex-start}
+    }
+
+    /* ===== LexiBot UPVM v3 - Chat IA ===== */
+    .lexibot-float{
+      position:fixed;right:22px;bottom:22px;width:64px;height:64px;border-radius:50%;
+      background:var(--primary);color:white;border:none;box-shadow:0 16px 40px rgba(0,0,0,.25);
+      cursor:pointer;z-index:9999;font-size:26px;display:flex;align-items:center;justify-content:center;
+    }
+    .lexibot-widget{
+      position:fixed;right:22px;bottom:96px;width:min(390px,calc(100vw - 28px));height:min(590px,calc(100vh - 125px));
+      background:#fff;border-radius:22px;box-shadow:0 24px 70px rgba(15,23,42,.28);z-index:9999;
+      overflow:hidden;display:none;border:1px solid rgba(91,31,45,.18);
+    }
+    .lexibot-widget.open{display:flex;flex-direction:column}
+    .lexibot-head{background:var(--primary);color:white;padding:16px;display:flex;align-items:center;justify-content:space-between}
+    .lexibot-head h3{margin:0;color:white;font-size:18px}.lexibot-head span{font-size:12px;opacity:.9}
+    .lexibot-close{background:rgba(255,255,255,.18);color:white;border:none;border-radius:10px;width:34px;height:34px;font-size:18px;cursor:pointer}
+    .lexibot-messages{flex:1;padding:14px;background:#f8fafc;overflow:auto;display:flex;flex-direction:column;gap:12px}
+    .lexibot-msg{max-width:86%;padding:12px 14px;border-radius:16px;font-size:14px;line-height:1.45;white-space:pre-wrap}
+    .lexibot-msg.bot{align-self:flex-start;background:white;color:#1f2937;border:1px solid #e5e7eb}
+    .lexibot-msg.user{align-self:flex-end;background:var(--primary);color:white}
+    .lexibot-tools{display:flex;gap:8px;padding:10px 12px;border-top:1px solid #e5e7eb;background:#fff;flex-wrap:wrap}
+    .lexibot-tool{border:1px solid #e5e7eb;background:#f9fafb;border-radius:999px;padding:7px 10px;font-size:12px;font-weight:700;cursor:pointer;color:#374151}
+    .lexibot-input{display:flex;gap:8px;padding:12px;border-top:1px solid #e5e7eb;background:#fff}
+    .lexibot-input input{flex:1;font-size:14px;padding:12px;border-radius:14px;border:1px solid #d1d5db}
+    .lexibot-input button{background:var(--primary);color:white;border:none;border-radius:14px;padding:0 14px;font-weight:700;cursor:pointer}
+    .lexibot-input button:disabled{opacity:.6;cursor:not-allowed}
+    .lexibot-status{font-size:12px;color:#6b7280;padding:0 14px 10px;background:#fff}
+    .result-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    @media(max-width:700px){.lexibot-widget{right:14px;bottom:88px}.lexibot-float{right:16px;bottom:16px}}
+
+  </style>
+</head>
+<body class="adult-theme">
+
+  <section id="loginScreen" class="screen active">
+    <div class="card">
+      <div class="header">
+        <div class="logo">UP</div>
+        <div>
+          <h1>LexiUPVM</h1>
+          <p class="small">Proyecto de Sistemas Inteligentes UPVM para el apoyo en la detección de dificultades lectoras asociadas a la dislexia</p>
+        </div>
+      </div>
+
+      <p>Ingresa los datos del usuario. El sistema permite el estudio de personas de 7 a 59 años y adapta la evaluación según la edad y el grado de estudios registrado.</p>
+
+      <div class="result-box">
+        <strong>Población objetivo:</strong>
+        <p>Niños de 7 a 11 años, adolescentes de 12 a 17 años, jóvenes adultos de 18 a 39 años y adultos de 40 a 59 años.</p>
+      </div>
+      <div class="result-box">
+        <strong>Adaptación inteligente:</strong>
+        <p>La edad define el perfil del usuario, pero la dificultad de palabras y textos se ajusta con la escolaridad. Por ejemplo, un adulto con primaria recibe ejercicios prácticos y claros, no textos universitarios.</p>
+      </div>
+
+
+      <div class="grid">
+        <div>
+          <label for="name">Nombre</label>
+          <input id="name" type="text" placeholder="Nombre del usuario">
+        </div>
+        <div>
+          <label for="age">Edad</label>
+          <input id="age" type="number" min="7" max="59" placeholder="Edad">
+        </div>
+      </div>
+
+      <div class="grid">
+        <div>
+          <label for="gender">Género</label>
+          <select id="gender">
+            <option value="">Seleccionar</option>
+            <option>Femenino</option>
+            <option>Masculino</option>
+            <option>Otro</option>
+            <option>Prefiero no decirlo</option>
+          </select>
+        </div>
+        <div>
+          <label for="school">Escolaridad</label>
+          <select id="school">
+            <option value="">Seleccionar</option>
+            <option>Primaria</option>
+            <option>Secundaria</option>
+            <option>Bachillerato</option>
+            <option>Universidad</option>
+            <option>Adulto</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="startIntro()">Continuar</button>
+      <p class="small">Nota: este programa no da un diagnóstico médico. Sólo estima un porcentaje de dificultad con base en edad, escolaridad, respuestas, errores, tiempo, corrección de texto y comprensión lectora.</p>
+    </div>
+  </section>
+
+  <section id="introScreen" class="screen">
+    <div class="card">
+      <h2 id="introTitle">Evaluación de lectura</h2>
+      <p id="introText"></p>
+
+      <div class="result-box">
+        <strong>¿Cómo funciona?</strong>
+        <p>Se mostrará una palabra alterada o desordenada. El usuario deberá elegir la palabra correcta. Cada pregunta tendrá un tiempo límite dependiendo de la edad y la dificultad calculada por escolaridad.</p>
+      </div>
+
+      <div class="result-box">
+        <strong>El sistema medirá:</strong>
+        <p>Respuestas correctas, errores, tiempo de respuesta, preguntas sin responder y porcentaje final de dificultad.</p>
+      </div>
+
+      <button class="btn btn-primary" onclick="startTest()">Iniciar evaluación</button>
+      <button class="btn btn-secondary" onclick="goTo('loginScreen')">Regresar</button>
+    </div>
+  </section>
+
+  <section id="testScreen" class="screen">
+    <div class="game-wrap">
+      <div class="topbar">
+        <div id="userInfo">Usuario</div>
+        <div class="timer">Tiempo: <span id="timer">0</span>s</div>
+        <div>Pregunta <span id="current">1</span>/<span id="total">10</span></div>
+      </div>
+
+      <div class="card">
+        <h2>Selecciona la palabra correcta</h2>
+        <div class="progress"><div id="bar"></div></div>
+
+        <p class="small" id="levelText"></p>
+        <div id="word" class="test-word">---</div>
+        <div id="imageSupport" class="image-support"></div>
+
+        <div id="options" class="options"></div>
+      </div>
+    </div>
+  </section>
+
+
+  <section id="readingScreen" class="screen">
+    <div class="card">
+      <h2>Lectura y corrección de texto</h2>
+      <p id="readingInstruction"></p>
+
+      <div class="result-box">
+        <strong>Texto editable:</strong>
+        <p class="small">Lee con atención y modifica directamente dentro del texto las palabras que consideres incorrectas. No se indicará cuáles son.</p>
+        <div id="readingImageSupport" class="image-support"></div>
+        <div id="readingText" class="reading-text" contenteditable="true" spellcheck="false"></div>
+      </div>
+
+      <button class="btn btn-primary" onclick="checkCorrections()">Terminé de corregir el texto</button>
+    </div>
+  </section>
+
+  <section id="questionsScreen" class="screen">
+    <div class="card">
+      <h2>Preguntas de comprensión</h2>
+      <p>Contesta según el texto que leíste.</p>
+      <div id="readingQuestions"></div>
+      <button class="btn btn-primary" onclick="checkReadingQuestions()">Finalizar evaluación</button>
+    </div>
+  </section>
+
+  <section id="resultScreen" class="screen">
+    <div class="card">
+      <h2>Resultado de evaluación</h2>
+      <p id="summary"></p>
+
+      <div class="result-box">
+        <h3>Porcentaje estimado de dificultad: <span id="difficultyPercent"></span>%</h3>
+        <h3>Nivel de riesgo: <span id="riskLevel"></span></h3>
+      </div>
+
+      <div class="grid">
+        <div class="result-box">
+          <strong>Correctas:</strong>
+          <p id="corrects"></p>
+        </div>
+        <div class="result-box">
+          <strong>Errores:</strong>
+          <p id="errors"></p>
+        </div>
+        <div class="result-box">
+          <strong>Sin responder:</strong>
+          <p id="timeouts"></p>
+        </div>
+        <div class="result-box">
+          <strong>Tiempo promedio:</strong>
+          <p id="avgTime"></p>
+        </div>
+      </div>
+
+      <h3>Detalle de respuestas</h3>
+      <div style="overflow:auto">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Palabra mostrada</th>
+              <th>Correcta</th>
+              <th>Respuesta</th>
+              <th>Posición</th>
+              <th>Tiempo</th>
+              <th>Resultado</th>
+            </tr>
+          </thead>
+          <tbody id="detailTable"></tbody>
+        </table>
+      </div>
+
+      <button id="supportBtnMain" class="btn btn-primary" type="button" onclick="openRecommendations(event)">Ver recomendaciones y ejercicios de apoyo</button>
+      <button class="btn btn-secondary" onclick="resetAll()">Nueva evaluación</button>
+    </div>
+  </section>
+
+  <section id="supportScreen" class="screen">
+    <div class="card">
+      <h2>Recomendaciones y ejercicios de apoyo</h2>
+      <p id="supportIntro"></p>
+
+      <div class="result-box">
+        <strong>Objetivo diario:</strong>
+        <p>Practicar de 10 a 15 minutos al día para reforzar lectura, ordenamiento de palabras, corrección visual y comprensión. No busca diagnosticar ni curar; sirve como apoyo para identificar qué área necesita más práctica.</p>
+      </div>
+
+      <div id="supportSections"></div>
+      <div id="supportExercises"></div>
+
+      <div class="support-panel">
+        <h3>Rutina diaria sugerida</h3>
+        <div class="daily-checklist">
+          <label><input type="checkbox"> Leer un texto corto en voz baja y después en voz alta.</label>
+          <label><input type="checkbox"> Ordenar 5 a 10 palabras mezcladas.</label>
+          <label><input type="checkbox"> Corregir 3 palabras alteradas dentro de una oración.</label>
+          <label><input type="checkbox"> Escribir una frase resumen de lo leído.</label>
+          <label><input type="checkbox"> Anotar las palabras que causaron más dificultad.</label>
+        </div>
+        <button class="mini-btn" onclick="markDailyDone()">Marcar práctica de hoy</button>
+        <p id="dailyFeedback" class="feedback"></p>
+      </div>
+
+      <button class="btn btn-primary" onclick="resetSupportExercises()">Generar nuevos ejercicios</button>
+      <button class="btn btn-secondary" onclick="goTo('resultScreen')">Regresar a resultados</button>
+    </div>
+  </section>
+
+<script>
+/* LexiUPVM - versión ampliada
+   Ajustes principales:
+   - 10 palabras aleatorias por evaluación desde bancos más grandes.
+   - Dificultad adaptada por edad y escolaridad.
+   - Lecturas aleatorias por nivel.
+   - Resultados por secciones: palabras, tiempo, corrección y comprensión.
+   - Recomendaciones de ejercicios no médicos según el área con mayor dificultad.
+*/
+
+const QUESTION_COUNT = 10;
+
+const banks = {
+  basic: [
+    {wrong:'FEHCA', correct:'FECHA', type:'ordenar', options:['FECHA','FICHA','HECHA','FLECHA']},
+    {wrong:'HORAIRO', correct:'HORARIO', type:'ordenar', options:['HORARIO','HORA','HONORARIO','HORAIRO']},
+    {wrong:'DINREO', correct:'DINERO', type:'ordenar', options:['DINERO','DIARIO','ENERO','DINREO']},
+    {wrong:'AVSIO', correct:'AVISO', type:'ordenar', options:['AVISO','VASO','ENVÍO','AVSIO']},
+    {wrong:'REICBO', correct:'RECIBO', type:'ordenar', options:['RECIBO','RECETA','REBOCI','RECINTO']},
+    {wrong:'FIAMR', correct:'FIRMA', type:'ordenar', options:['FIRMA','FORMA','FIRME','FILA']},
+    {wrong:'CAELL', correct:'CALLE', type:'ordenar', options:['CALLE','CABLE','CALLÓ','CLAVE']},
+    {wrong:'BNACO', correct:'BANCO', type:'ordenar', options:['BANCO','BARCO','BLANCO','BANCA']},
+    {wrong:'CTAÍ', correct:'CITA', type:'ordenar', options:['CITA','CIMA','CINTA','CISTA']},
+    {wrong:'NUEMRO', correct:'NÚMERO', type:'ordenar', options:['NÚMERO','NUMERO','MUÑECO','NOMBRE']},
+    {wrong:'CLNÍICA', correct:'CLÍNICA', type:'leer', options:['CLÍNICA','CLÍNICA','CLIMÁTICA','CRÓNICA']},
+    {wrong:'MEDCIINA', correct:'MEDICINA', type:'ordenar', options:['MEDICINA','MEDIDA','MEDCIINA','MEDITA']},
+    {wrong:'TRJETA', correct:'TARJETA', type:'ordenar', options:['TARJETA','TRAJETA','TAREA','TARIMA']},
+    {wrong:'TLEÉFONO', correct:'TELÉFONO', type:'leer', options:['TELÉFONO','TELEFÓNO','TELÉGRAFO','TELEVISOR']},
+    {wrong:'DIRECCÓN', correct:'DIRECCIÓN', type:'leer', options:['DIRECCIÓN','DIRECCÓN','DECISIÓN','DISTRACCIÓN']},
+    {wrong:'NOMRBE', correct:'NOMBRE', type:'ordenar', options:['NOMBRE','HOMBRE','NOMBRAR','NOMRBE']},
+    {wrong:'APELILDO', correct:'APELLIDO', type:'ordenar', options:['APELLIDO','APELIDO','PEDIDO','APELILDO']},
+    {wrong:'FAMLIAR', correct:'FAMILIAR', type:'leer', options:['FAMILIAR','FAMLIAR','FAMILIA','FARMACIA']},
+    {wrong:'COMPRAOBNTE', correct:'COMPROBANTE', type:'ordenar', options:['COMPROBANTE','COMPROBAR','COMPRAOBNTE','COMPONENTE']},
+    {wrong:'DOMCILIO', correct:'DOMICILIO', type:'ordenar', options:['DOMICILIO','DOMINIO','DOMCILIO','DOMÉSTICO']}
+  ],
+  child: [
+    {wrong:'TAOG', correct:'GATO', image:'🐱', type:'ordenar', options:['GATO','TACO','GOTA','PATO']},
+    {wrong:'ASME', correct:'MESA', image:'🪑', type:'ordenar', options:['MESA','MASA','SEMA','META']},
+    {wrong:'UNAL', correct:'LUNA', image:'🌙', type:'ordenar', options:['LUNA','LUPA','LONA','UNA']},
+    {wrong:'ORLFO', correct:'FLOR', image:'🌸', type:'ordenar', options:['FLOR','FARO','FORO','OLOR']},
+    {wrong:'APEPL', correct:'PAPEL', image:'📄', type:'ordenar', options:['PAPEL','PALPE','PALETA','PELO']},
+    {wrong:'ELUACSE', correct:'ESCUELA', image:'🏫', type:'ordenar', options:['ESCUELA','ESCLA','ESCUCHA','ESCALA']},
+    {wrong:'LBRIO', correct:'LIBRO', image:'📘', type:'ordenar', options:['LIBRO','LIRBO','LARGO','BRILLO']},
+    {wrong:'PATRU', correct:'PUERTA', image:'🚪', type:'ordenar', options:['PUERTA','PIEDRA','PUESTA','PLANTA']},
+    {wrong:'ASCA', correct:'CASA', image:'🏠', type:'ordenar', options:['CASA','CAMA','SACA','CARA']},
+    {wrong:'NIÑ0', correct:'NIÑO', image:'🧒', type:'leer', options:['NIÑO','NIDO','NIÑOS','NILO']},
+    {wrong:'PELTOA', correct:'PELOTA', image:'⚽', type:'ordenar', options:['PELOTA','PALOMA','PILOTO','PELO']},
+    {wrong:'ÁRBL', correct:'ÁRBOL', image:'🌳', type:'leer', options:['ÁRBOL','ARBOL','ABRIL','ÁNGEL']},
+    {wrong:'CUADRENO', correct:'CUADERNO', image:'📓', type:'ordenar', options:['CUADERNO','CUADRO','CUADRENO','CUARTO']},
+    {wrong:'MOCHLIA', correct:'MOCHILA', image:'🎒', type:'ordenar', options:['MOCHILA','MOLICHA','MOCHLIA','MÁQUINA']},
+    {wrong:'VENTNAA', correct:'VENTANA', image:'🪟', type:'ordenar', options:['VENTANA','VENTA','VENTNAA','VENADO']},
+    {wrong:'JUGUETE', correct:'JUGUETE', image:'🧸', type:'leer', options:['JUGUETE','JUGETE','JINETE','JUGADOR']},
+    {wrong:'CARRTEA', correct:'CARRETA', image:'🛒', type:'ordenar', options:['CARRETA','CARRETERA','CARRTEA','CARRERA']},
+    {wrong:'AMGIOS', correct:'AMIGOS', image:'👫', type:'ordenar', options:['AMIGOS','AMGIOS','AMIGAS','ABRIGOS']},
+    {wrong:'MRAIPOSA', correct:'MARIPOSA', image:'🦋', type:'ordenar', options:['MARIPOSA','MRAIPOSA','MIRADOR','MARINO']},
+    {wrong:'ZPAATO', correct:'ZAPATO', image:'👟', type:'ordenar', options:['ZAPATO','ZPAATO','ZANAHORIA','ZÓCALO']}
+  ],
+  teen: [
+    {wrong:'BIBLOTECA', correct:'BIBLIOTECA', type:'leer', options:['BIBLIOTECA','BIBLOTECA','BIBLIOTACA','BIBLIOTECO']},
+    {wrong:'PORGRAMA', correct:'PROGRAMA', type:'ordenar', options:['PROGRAMA','PORGRAMA','PANORAMA','PROBLEMA']},
+    {wrong:'COMPUTADROA', correct:'COMPUTADORA', type:'ordenar', options:['COMPUTADORA','COMPUTADROA','COMPUTACIÓN','COMPARADORA']},
+    {wrong:'UNIVESRIDAD', correct:'UNIVERSIDAD', type:'ordenar', options:['UNIVERSIDAD','UNIVESRIDAD','DIVERSIDAD','UNIVERSAL']},
+    {wrong:'INFORMCAIÓN', correct:'INFORMACIÓN', type:'leer', options:['INFORMACIÓN','INFORMCAIÓN','FORMACIÓN','INFORMADOR']},
+    {wrong:'DESAROLLO', correct:'DESARROLLO', type:'leer', options:['DESARROLLO','DESAROLLO','DESENROLLO','DESARROLLA']},
+    {wrong:'SISTEAM', correct:'SISTEMA', type:'ordenar', options:['SISTEMA','SISTEAM','SISMA','TEMA']},
+    {wrong:'INTELIGNECIA', correct:'INTELIGENCIA', type:'ordenar', options:['INTELIGENCIA','INTELIGNECIA','INTENCIONAL','INTEGRACIÓN']},
+    {wrong:'APRENDIZAJE', correct:'APRENDIZAJE', type:'leer', options:['APRENDIZAJE','APRENDISAJE','APRENDIZA','APRENDER']},
+    {wrong:'DIAGNÓSITCO', correct:'DIAGNÓSTICO', type:'leer', options:['DIAGNÓSTICO','DIAGNÓSITCO','DIAGRAMA','DIAGNOSTICAR']},
+    {wrong:'EXPOSCIÓN', correct:'EXPOSICIÓN', type:'leer', options:['EXPOSICIÓN','EXPOSCIÓN','EXPRESIÓN','EXPLICACIÓN']},
+    {wrong:'PROCEDIMEINTO', correct:'PROCEDIMIENTO', type:'ordenar', options:['PROCEDIMIENTO','PROCEDIMEINTO','PROCESO','PROYECTO']},
+    {wrong:'CUETSIONARIO', correct:'CUESTIONARIO', type:'ordenar', options:['CUESTIONARIO','CUETSIONARIO','CUESTIÓN','CUADERNILLO']},
+    {wrong:'PARTCIIPACIÓN', correct:'PARTICIPACIÓN', type:'leer', options:['PARTICIPACIÓN','PARTCIIPACIÓN','PARTIDO','PRESENTACIÓN']},
+    {wrong:'ORGANZIAR', correct:'ORGANIZAR', type:'ordenar', options:['ORGANIZAR','ORGANZIAR','ORIGINAL','ORDENAR']},
+    {wrong:'ANÁLISIS', correct:'ANÁLISIS', type:'leer', options:['ANÁLISIS','ANALSIS','ANALIZAR','ANUNCIO']},
+    {wrong:'INVESTGIACIÓN', correct:'INVESTIGACIÓN', type:'ordenar', options:['INVESTIGACIÓN','INVESTGIACIÓN','INVENTARIO','INSTRUCCIÓN']},
+    {wrong:'CONCLSIÓN', correct:'CONCLUSIÓN', type:'leer', options:['CONCLUSIÓN','CONCLSIÓN','CONFUSIÓN','CONDICIÓN']},
+    {wrong:'HIPÓTSIS', correct:'HIPÓTESIS', type:'leer', options:['HIPÓTESIS','HIPÓTSIS','HISTORIA','HÁBITOS']},
+    {wrong:'RESMUEN', correct:'RESUMEN', type:'ordenar', options:['RESUMEN','RESMUEN','REUNIÓN','REVISIÓN']}
+  ],
+  youngAdult: [
+    {wrong:'INTERPRETCAIÓN', correct:'INTERPRETACIÓN', type:'ordenar', options:['INTERPRETACIÓN','INTERPRETCAIÓN','INTEGRACIÓN','INTERVENCIÓN']},
+    {wrong:'RESPONSABILDAD', correct:'RESPONSABILIDAD', type:'leer', options:['RESPONSABILIDAD','RESPONSABILDAD','RESPUESTA','RESPONSABLE']},
+    {wrong:'ADMINISTRAICÓN', correct:'ADMINISTRACIÓN', type:'leer', options:['ADMINISTRACIÓN','ADMINISTRAICÓN','ADMIRACIÓN','ADMINISTRADOR']},
+    {wrong:'COMUNICAIÓN', correct:'COMUNICACIÓN', type:'leer', options:['COMUNICACIÓN','COMUNICAIÓN','COMUNIDAD','COMUNICADO']},
+    {wrong:'ORGANIZACÓN', correct:'ORGANIZACIÓN', type:'leer', options:['ORGANIZACIÓN','ORGANIZACÓN','ORGANISMO','ORDENACIÓN']},
+    {wrong:'EVALAUCIÓN', correct:'EVALUACIÓN', type:'ordenar', options:['EVALUACIÓN','EVALAUCIÓN','EVOLUCIÓN','VALORACIÓN']},
+    {wrong:'CONCENTRAICÓN', correct:'CONCENTRACIÓN', type:'leer', options:['CONCENTRACIÓN','CONCENTRAICÓN','CONSERVACIÓN','CONTESTACIÓN']},
+    {wrong:'RECONOCIMEINTO', correct:'RECONOCIMIENTO', type:'ordenar', options:['RECONOCIMIENTO','RECONOCIMEINTO','CONOCIMIENTO','RECONOCER']},
+    {wrong:'PROCESAMEINTO', correct:'PROCESAMIENTO', type:'ordenar', options:['PROCESAMIENTO','PROCESAMEINTO','PROCEDIMIENTO','PROCESADOR']},
+    {wrong:'ESTRATEGIA', correct:'ESTRATEGIA', type:'leer', options:['ESTRATEGIA','ESTRATÉGICA','ESTRAGEGIA','ENERGÍA']},
+    {wrong:'PLANECAIÓN', correct:'PLANEACIÓN', type:'leer', options:['PLANEACIÓN','PLANECAIÓN','PLANIFICAR','PRESENTACIÓN']},
+    {wrong:'RETROALIMENTAICÓN', correct:'RETROALIMENTACIÓN', type:'leer', options:['RETROALIMENTACIÓN','RETROALIMENTAICÓN','RELACIÓN','RECOMENDACIÓN']},
+    {wrong:'IMPLEMENTAICÓN', correct:'IMPLEMENTACIÓN', type:'leer', options:['IMPLEMENTACIÓN','IMPLEMENTAICÓN','IMPLICACIÓN','INTEGRACIÓN']},
+    {wrong:'ARGUMNETACIÓN', correct:'ARGUMENTACIÓN', type:'ordenar', options:['ARGUMENTACIÓN','ARGUMNETACIÓN','AGRUPACIÓN','ARGUMENTO']},
+    {wrong:'PERCEPCÓN', correct:'PERCEPCIÓN', type:'leer', options:['PERCEPCIÓN','PERCEPCÓN','PREDICCIÓN','PRECISIÓN']},
+    {wrong:'CLASIFCIACIÓN', correct:'CLASIFICACIÓN', type:'ordenar', options:['CLASIFICACIÓN','CLASIFCIACIÓN','CALIFICACIÓN','CLARIFICACIÓN']},
+    {wrong:'ALGORITMO', correct:'ALGORITMO', type:'leer', options:['ALGORITMO','ALGORITMIA','AUTÓMATA','ANÁLISIS']},
+    {wrong:'DESICIÓN', correct:'DECISIÓN', type:'leer', options:['DECISIÓN','DESICIÓN','DIRECCIÓN','DIFUSIÓN']},
+    {wrong:'SINTEIS', correct:'SÍNTESIS', type:'ordenar', options:['SÍNTESIS','SINTEIS','SISTEMA','SIMETRÍA']},
+    {wrong:'COMPRENSÓN', correct:'COMPRENSIÓN', type:'leer', options:['COMPRENSIÓN','COMPRENSÓN','COMPRESIÓN','COMPOSICIÓN']}
+  ],
+  adult: [
+    {wrong:'MEDCIAMENTO', correct:'MEDICAMENTO', type:'ordenar', options:['MEDICAMENTO','MEDCIAMENTO','MEDICINA','MEDITACIÓN']},
+    {wrong:'RECETA MÉDICA', correct:'RECETA MÉDICA', type:'leer', options:['RECETA MÉDICA','RECETA MEDIDA','RECETA RÁPIDA','RECETA ÚNICA']},
+    {wrong:'TELEFÓNO', correct:'TELÉFONO', type:'leer', options:['TELÉFONO','TELEFÓNO','TELEVISIÓN','TELÉGRAFO']},
+    {wrong:'DIRECCÓN', correct:'DIRECCIÓN', type:'leer', options:['DIRECCIÓN','DIRECCÓN','DECISIÓN','DISTRACCIÓN']},
+    {wrong:'DOCUMENTAICÓN', correct:'DOCUMENTACIÓN', type:'ordenar', options:['DOCUMENTACIÓN','DOCUMENTAICÓN','DOCUMENTAL','DOMINACIÓN']},
+    {wrong:'INSTRUCCIOENS', correct:'INSTRUCCIONES', type:'ordenar', options:['INSTRUCCIONES','INSTRUCCIOENS','INSTITUCIONES','INTRODUCCIONES']},
+    {wrong:'CALENDRAIO', correct:'CALENDARIO', type:'ordenar', options:['CALENDARIO','CALENDRAIO','CALENTADOR','CALENDADO']},
+    {wrong:'FAMILIAR', correct:'FAMILIAR', type:'leer', options:['FAMILIAR','FAMLIAR','FAMILIA','FARMACIA']},
+    {wrong:'CONSULTORIO', correct:'CONSULTORIO', type:'leer', options:['CONSULTORIO','CONSULTORÍA','CONSUTORIO','CONSUMO']},
+    {wrong:'RECOMENDAICÓN', correct:'RECOMENDACIÓN', type:'ordenar', options:['RECOMENDACIÓN','RECOMENDAICÓN','RECORDACIÓN','COMUNICACIÓN']},
+    {wrong:'CONTRSEÑA', correct:'CONTRASEÑA', type:'ordenar', options:['CONTRASEÑA','CONTRSEÑA','CONTRATO','CONTRARIA']},
+    {wrong:'SERVCIIO', correct:'SERVICIO', type:'ordenar', options:['SERVICIO','SERVCIIO','SEGURO','SENCILLO']},
+    {wrong:'AUTORIZAICÓN', correct:'AUTORIZACIÓN', type:'leer', options:['AUTORIZACIÓN','AUTORIZAICÓN','AUTORIDAD','ATENCIÓN']},
+    {wrong:'TRÁMTE', correct:'TRÁMITE', type:'leer', options:['TRÁMITE','TRÁMTE','TRÁFICO','TRATAMIENTO']},
+    {wrong:'CONVENIO', correct:'CONVENIO', type:'leer', options:['CONVENIO','CONVENIÓ','CONVENCER','CONTENIDO']},
+    {wrong:'DECLARAICÓN', correct:'DECLARACIÓN', type:'leer', options:['DECLARACIÓN','DECLARAICÓN','DECORACIÓN','DELEGACIÓN']},
+    {wrong:'PRESUPUESTO', correct:'PRESUPUESTO', type:'leer', options:['PRESUPUESTO','PRESUPUESTA','PROPUESTO','PRESENTADO']},
+    {wrong:'COMPROBNATE', correct:'COMPROBANTE', type:'ordenar', options:['COMPROBANTE','COMPROBNATE','COMPONENTE','COMPRADOR']},
+    {wrong:'RECUPERAICÓN', correct:'RECUPERACIÓN', type:'leer', options:['RECUPERACIÓN','RECUPERAICÓN','RECREACIÓN','REPARACIÓN']},
+    {wrong:'SEGUIMEINTO', correct:'SEGUIMIENTO', type:'ordenar', options:['SEGUIMIENTO','SEGUIMEINTO','SEGURIDAD','SENTIMIENTO']}
+  ]
+};
+
+const readingBanks = {
+  basic: [
+    {
+      text:'Rosa revisó su recibo de luz. En el papel aparecía la fehca de pago y el monto total. Después guardó el recibo en una carpeta para llevarlo al banco.',
+      correctText:'Rosa revisó su recibo de luz. En el papel aparecía la fecha de pago y el monto total. Después guardó el recibo en una carpeta para llevarlo al banco.',
+      wrongWords:[{wrong:'fehca', correct:'fecha'}],
+      questions:[
+        {q:'¿Qué revisó Rosa?', options:['Un recibo de luz','Una revista','Una receta'], correct:'Un recibo de luz'},
+        {q:'¿Dónde guardó el recibo?', options:['En una carpeta','En una bolsa','En la mesa'], correct:'En una carpeta'},
+        {q:'¿A dónde lo iba a llevar?', options:['Al banco','Al cine','A la escuela'], correct:'Al banco'}
+      ]
+    },
+    {
+      text:'Miguel tenía una cita en el centro de salud. Anotó el horairo en una hoja y pidió apoyo para encontrar la direccón correcta.',
+      correctText:'Miguel tenía una cita en el centro de salud. Anotó el horario en una hoja y pidió apoyo para encontrar la dirección correcta.',
+      wrongWords:[{wrong:'horairo', correct:'horario'}, {wrong:'direccón', correct:'dirección'}],
+      questions:[
+        {q:'¿Dónde tenía cita Miguel?', options:['En el centro de salud','En el mercado','En el banco'], correct:'En el centro de salud'},
+        {q:'¿Qué anotó?', options:['El horario','El precio','El nombre de una calle'], correct:'El horario'},
+        {q:'¿Qué quería encontrar?', options:['La dirección correcta','Una receta','Una mochila'], correct:'La dirección correcta'}
+      ]
+    },
+    {
+      text:'Elena fue al banco para pagar una tarjeta. Revisó el numreo de cuenta y firmó el comprobnate antes de salir.',
+      correctText:'Elena fue al banco para pagar una tarjeta. Revisó el número de cuenta y firmó el comprobante antes de salir.',
+      wrongWords:[{wrong:'numreo', correct:'número'}, {wrong:'comprobnate', correct:'comprobante'}],
+      questions:[
+        {q:'¿A dónde fue Elena?', options:['Al banco','A la farmacia','A la escuela'], correct:'Al banco'},
+        {q:'¿Qué revisó?', options:['El número de cuenta','Un mapa','Una foto'], correct:'El número de cuenta'},
+        {q:'¿Qué firmó?', options:['El comprobante','Una revista','Un cuaderno'], correct:'El comprobante'}
+      ]
+    },
+    {
+      text:'Jorge recibió un aviso de su colonia. Leyó la calle, la hora y el día de la reunión para no confundirse.',
+      correctText:'Jorge recibió un aviso de su colonia. Leyó la calle, la hora y el día de la reunión para no confundirse.',
+      wrongWords:[],
+      questions:[
+        {q:'¿Qué recibió Jorge?', options:['Un aviso','Una receta','Un boleto'], correct:'Un aviso'},
+        {q:'¿Qué datos leyó?', options:['Calle, hora y día','Color y precio','Nombre y edad'], correct:'Calle, hora y día'},
+        {q:'¿Para qué leyó con cuidado?', options:['Para no confundirse','Para jugar','Para dormir'], correct:'Para no confundirse'}
+      ]
+    }
+  ],
+  child: [
+    {
+      text:'Ana fue a la esculea con su mochila azul. En el recreo leyó un libor sobre animales y después jugó con sus amigos. Al final del día regresó a su csa muy contenta.',
+      correctText:'Ana fue a la escuela con su mochila azul. En el recreo leyó un libro sobre animales y después jugó con sus amigos. Al final del día regresó a su casa muy contenta.',
+      wrongWords:[{wrong:'esculea', correct:'escuela'}, {wrong:'libor', correct:'libro'}, {wrong:'csa', correct:'casa'}],
+      questions:[
+        {q:'¿A dónde fue Ana?', options:['A la escuela','Al cine','Al mercado'], correct:'A la escuela'},
+        {q:'¿De qué trataba el libro?', options:['De animales','De carros','De planetas'], correct:'De animales'},
+        {q:'¿Cómo regresó Ana a casa?', options:['Contenta','Triste','Enojada'], correct:'Contenta'}
+      ]
+    },
+    {
+      text:'Luis encontró una peltoa roja en el patio. La llevó a su cas y después invitó a su hermano a jugar bajo el árbl.',
+      correctText:'Luis encontró una pelota roja en el patio. La llevó a su casa y después invitó a su hermano a jugar bajo el árbol.',
+      wrongWords:[{wrong:'peltoa', correct:'pelota'}, {wrong:'cas', correct:'casa'}, {wrong:'árbl', correct:'árbol'}],
+      questions:[
+        {q:'¿Qué encontró Luis?', options:['Una pelota roja','Un libro azul','Una flor'], correct:'Una pelota roja'},
+        {q:'¿A quién invitó?', options:['A su hermano','A su maestra','A su vecina'], correct:'A su hermano'},
+        {q:'¿Dónde jugaron?', options:['Bajo el árbol','En la cocina','En el cine'], correct:'Bajo el árbol'}
+      ]
+    },
+    {
+      text:'Marta puso su cuaderno en la mochlila. Luego caminó hacia la puerta y saludó a sus amigos en el salón.',
+      correctText:'Marta puso su cuaderno en la mochila. Luego caminó hacia la puerta y saludó a sus amigos en el salón.',
+      wrongWords:[{wrong:'mochlila', correct:'mochila'}],
+      questions:[
+        {q:'¿Qué puso Marta en la mochila?', options:['Su cuaderno','Una pelota','Un gato'], correct:'Su cuaderno'},
+        {q:'¿Hacia dónde caminó?', options:['Hacia la puerta','Hacia el parque','Hacia el mercado'], correct:'Hacia la puerta'},
+        {q:'¿A quién saludó?', options:['A sus amigos','A un doctor','A un policía'], correct:'A sus amigos'}
+      ]
+    },
+    {
+      text:'Pedro leyó un cuento de una maripsoa. Después dibujó una flor amarilla y escribió su nombre debajo del dibujo.',
+      correctText:'Pedro leyó un cuento de una mariposa. Después dibujó una flor amarilla y escribió su nombre debajo del dibujo.',
+      wrongWords:[{wrong:'maripsoa', correct:'mariposa'}],
+      questions:[
+        {q:'¿De qué era el cuento?', options:['De una mariposa','De un carro','De un barco'], correct:'De una mariposa'},
+        {q:'¿Qué dibujó?', options:['Una flor amarilla','Una casa azul','Una luna roja'], correct:'Una flor amarilla'},
+        {q:'¿Qué escribió?', options:['Su nombre','Un número','Una receta'], correct:'Su nombre'}
+      ]
+    }
+  ],
+  teen: [
+    {
+      text:'Carlos tenía que entregar un porgrama para la clase de tecnología. Buscó informaicón en la biblioteca y corrigió cada detale antes de enviarlo. Su maestra revisó el trabajo y le pidió explicar el procedimiento.',
+      correctText:'Carlos tenía que entregar un programa para la clase de tecnología. Buscó información en la biblioteca y corrigió cada detalle antes de enviarlo. Su maestra revisó el trabajo y le pidió explicar el procedimiento.',
+      wrongWords:[{wrong:'porgrama', correct:'programa'}, {wrong:'informaicón', correct:'información'}, {wrong:'detale', correct:'detalle'}],
+      questions:[
+        {q:'¿Qué tenía que entregar Carlos?', options:['Un programa','Una maqueta','Un examen'], correct:'Un programa'},
+        {q:'¿Dónde buscó información?', options:['En la biblioteca','En la tienda','En el parque'], correct:'En la biblioteca'},
+        {q:'¿Qué le pidió explicar la maestra?', options:['El procedimiento','La portada','El horario'], correct:'El procedimiento'}
+      ]
+    },
+    {
+      text:'Sofía preparó una exposción sobre inteligencia artificial. Organizó las ideas en un esquma y practicó su explicaicón antes de pasar al frente.',
+      correctText:'Sofía preparó una exposición sobre inteligencia artificial. Organizó las ideas en un esquema y practicó su explicación antes de pasar al frente.',
+      wrongWords:[{wrong:'exposción', correct:'exposición'}, {wrong:'esquma', correct:'esquema'}, {wrong:'explicaicón', correct:'explicación'}],
+      questions:[
+        {q:'¿Sobre qué era la exposición?', options:['Inteligencia artificial','Cocina','Deportes'], correct:'Inteligencia artificial'},
+        {q:'¿Dónde organizó las ideas?', options:['En un esquema','En una bolsa','En un juego'], correct:'En un esquema'},
+        {q:'¿Qué practicó?', options:['Su explicación','Una canción','Un baile'], correct:'Su explicación'}
+      ]
+    },
+    {
+      text:'El equipo leyó las instruccioens del proyecto. Después hizo un resumen y escribió una conclusón clara para entregar el archivo.',
+      correctText:'El equipo leyó las instrucciones del proyecto. Después hizo un resumen y escribió una conclusión clara para entregar el archivo.',
+      wrongWords:[{wrong:'instruccioens', correct:'instrucciones'}, {wrong:'conclusón', correct:'conclusión'}],
+      questions:[
+        {q:'¿Qué leyó el equipo?', options:['Las instrucciones','Un recibo','Una carta'], correct:'Las instrucciones'},
+        {q:'¿Qué hizo después?', options:['Un resumen','Una compra','Una receta'], correct:'Un resumen'},
+        {q:'¿Qué escribió al final?', options:['Una conclusión','Una canción','Un horario'], correct:'Una conclusión'}
+      ]
+    },
+    {
+      text:'Daniel realizó una investgiación para su clase. Comparó fuentes, revisó datos y preparó un cuestionario para sus compañeros.',
+      correctText:'Daniel realizó una investigación para su clase. Comparó fuentes, revisó datos y preparó un cuestionario para sus compañeros.',
+      wrongWords:[{wrong:'investgiación', correct:'investigación'}],
+      questions:[
+        {q:'¿Qué realizó Daniel?', options:['Una investigación','Una venta','Una llamada'], correct:'Una investigación'},
+        {q:'¿Qué comparó?', options:['Fuentes','Zapatos','Colores'], correct:'Fuentes'},
+        {q:'¿Qué preparó?', options:['Un cuestionario','Un desayuno','Una mochila'], correct:'Un cuestionario'}
+      ]
+    }
+  ],
+  youngAdult: [
+    {
+      text:'Mariana revisó un documento de administraicón antes de presentarlo en la reunión. Detectó problemas de comunicaicón entre las áreas y propuso una mejor organizaicón del trabajo. Al final, el equipo aceptó sus recomendaciones.',
+      correctText:'Mariana revisó un documento de administración antes de presentarlo en la reunión. Detectó problemas de comunicación entre las áreas y propuso una mejor organización del trabajo. Al final, el equipo aceptó sus recomendaciones.',
+      wrongWords:[{wrong:'administraicón', correct:'administración'}, {wrong:'comunicaicón', correct:'comunicación'}, {wrong:'organizaicón', correct:'organización'}],
+      questions:[
+        {q:'¿Qué revisó Mariana?', options:['Un documento','Una receta','Un mapa'], correct:'Un documento'},
+        {q:'¿Qué problema detectó?', options:['Comunicación entre áreas','Falta de transporte','Pérdida de dinero'], correct:'Comunicación entre áreas'},
+        {q:'¿Qué aceptó el equipo?', options:['Sus recomendaciones','Su renuncia','Un cambio de oficina'], correct:'Sus recomendaciones'}
+      ]
+    },
+    {
+      text:'El proyecto requiere una evalaución inicial para reconocer errores frecuentes. Con esos datos se ajusta la estrategia y se mejora la comprensión del usuario.',
+      correctText:'El proyecto requiere una evaluación inicial para reconocer errores frecuentes. Con esos datos se ajusta la estrategia y se mejora la comprensión del usuario.',
+      wrongWords:[{wrong:'evalaución', correct:'evaluación'}],
+      questions:[
+        {q:'¿Qué requiere el proyecto?', options:['Una evaluación inicial','Una venta','Una llamada'], correct:'Una evaluación inicial'},
+        {q:'¿Qué se busca reconocer?', options:['Errores frecuentes','Colores','Precios'], correct:'Errores frecuentes'},
+        {q:'¿Qué se mejora?', options:['La comprensión','La velocidad del internet','La música'], correct:'La comprensión'}
+      ]
+    },
+    {
+      text:'La percepción visual ayuda a identificar patrones en palabras. Si una persona confunde letras, el sistema registra el error y calcula un nivel de seguimiento.',
+      correctText:'La percepción visual ayuda a identificar patrones en palabras. Si una persona confunde letras, el sistema registra el error y calcula un nivel de seguimiento.',
+      wrongWords:[],
+      questions:[
+        {q:'¿Qué ayuda a identificar la percepción visual?', options:['Patrones en palabras','La temperatura','El precio'], correct:'Patrones en palabras'},
+        {q:'¿Qué registra el sistema?', options:['El error','La música','El color'], correct:'El error'},
+        {q:'¿Qué calcula?', options:['Un nivel de seguimiento','Un boleto','Una receta'], correct:'Un nivel de seguimiento'}
+      ]
+    },
+    {
+      text:'Antes de implementar una recomendaicón, el usuario debe revisar el resultado por secciones. Así puede saber si necesita practicar lectura, corrección o comprensión.',
+      correctText:'Antes de implementar una recomendación, el usuario debe revisar el resultado por secciones. Así puede saber si necesita practicar lectura, corrección o comprensión.',
+      wrongWords:[{wrong:'recomendaicón', correct:'recomendación'}],
+      questions:[
+        {q:'¿Qué debe revisar el usuario?', options:['El resultado por secciones','El color del logo','La hora del recreo'], correct:'El resultado por secciones'},
+        {q:'¿Para qué sirve?', options:['Para saber qué practicar','Para borrar datos','Para cerrar el sistema'], correct:'Para saber qué practicar'},
+        {q:'¿Qué áreas menciona el texto?', options:['Lectura, corrección o comprensión','Cocina y deporte','Música y dibujo'], correct:'Lectura, corrección o comprensión'}
+      ]
+    }
+  ],
+  adult: [
+    {
+      text:'Don Luis fue al consultorio para revisar su receta médica. La enfermera le explicó la direccón correcta y el horario de cada medciamento. Después, Don Luis guardó la documentaicón en una carpeta para no olvidarla.',
+      correctText:'Don Luis fue al consultorio para revisar su receta médica. La enfermera le explicó la dirección correcta y el horario de cada medicamento. Después, Don Luis guardó la documentación en una carpeta para no olvidarla.',
+      wrongWords:[{wrong:'direccón', correct:'dirección'}, {wrong:'medciamento', correct:'medicamento'}, {wrong:'documentaicón', correct:'documentación'}],
+      questions:[
+        {q:'¿A dónde fue Don Luis?', options:['Al consultorio','Al banco','A la escuela'], correct:'Al consultorio'},
+        {q:'¿Qué le explicó la enfermera?', options:['La dirección y el horario','El precio de una casa','Una receta de cocina'], correct:'La dirección y el horario'},
+        {q:'¿Dónde guardó la documentación?', options:['En una carpeta','En una mochila','En una caja de herramientas'], correct:'En una carpeta'}
+      ]
+    },
+    {
+      text:'Laura revisó una declaracón antes de enviarla. Comparó los datos del comprobante y corrigió el número de referencia para evitar confusiones.',
+      correctText:'Laura revisó una declaración antes de enviarla. Comparó los datos del comprobante y corrigió el número de referencia para evitar confusiones.',
+      wrongWords:[{wrong:'declaracón', correct:'declaración'}],
+      questions:[
+        {q:'¿Qué revisó Laura?', options:['Una declaración','Una receta','Una novela'], correct:'Una declaración'},
+        {q:'¿Qué comparó?', options:['Los datos del comprobante','Los colores','Los zapatos'], correct:'Los datos del comprobante'},
+        {q:'¿Para qué corrigió el número?', options:['Para evitar confusiones','Para cantar','Para dormir'], correct:'Para evitar confusiones'}
+      ]
+    },
+    {
+      text:'El señor Ramírez recibió instrucciones para un trámite. Primero leyó el documento completo, después marcó las palabras difíciles y finalmente pidió orientación.',
+      correctText:'El señor Ramírez recibió instrucciones para un trámite. Primero leyó el documento completo, después marcó las palabras difíciles y finalmente pidió orientación.',
+      wrongWords:[],
+      questions:[
+        {q:'¿Qué recibió el señor Ramírez?', options:['Instrucciones para un trámite','Una pelota','Una receta de cocina'], correct:'Instrucciones para un trámite'},
+        {q:'¿Qué hizo después de leer?', options:['Marcó palabras difíciles','Borró el texto','Salió a correr'], correct:'Marcó palabras difíciles'},
+        {q:'¿Qué pidió al final?', options:['Orientación','Dinero','Un boleto'], correct:'Orientación'}
+      ]
+    },
+    {
+      text:'Patricia leyó una autorización escolar. Revisó el nombre, la fecha y la firma. Al detectar una palabra incompleta, la corrigió antes de entregar el formato.',
+      correctText:'Patricia leyó una autorización escolar. Revisó el nombre, la fecha y la firma. Al detectar una palabra incompleta, la corrigió antes de entregar el formato.',
+      wrongWords:[],
+      questions:[
+        {q:'¿Qué leyó Patricia?', options:['Una autorización escolar','Un menú','Una factura antigua'], correct:'Una autorización escolar'},
+        {q:'¿Qué datos revisó?', options:['Nombre, fecha y firma','Color y talla','Precio y marca'], correct:'Nombre, fecha y firma'},
+        {q:'¿Qué corrigió?', options:['Una palabra incompleta','Una foto','Una contraseña'], correct:'Una palabra incompleta'}
+      ]
+    }
+  ]
+};
+
+let user = {};
+let currentBank = [];
+let selectedReadingData = null;
+let lastSectionProblems = null;
+let lastRisk = null;
+let lastDifficulty = 0;
+let lastRecommendations = null;
+let supportStartedAt = null;
+let index = 0;
+let correct = 0;
+let errors = 0;
+let timeouts = 0;
+let results = [];
+let timerInterval = null;
+let timeLeft = 0;
+let questionStart = 0;
+let timeLimit = 12;
+let readingResults = {};
+
+function goTo(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function randomSample(array, count){
+  return shuffleOptions(array).slice(0, Math.min(count, array.length));
+}
+
+function randomItem(array){
+  return array[Math.floor(Math.random() * array.length)];
+}
+
+function getGroup(age){
+  if(age >= 7 && age <= 11) return 'child';
+  if(age >= 12 && age <= 17) return 'teen';
+  if(age >= 18 && age <= 39) return 'youngAdult';
+  if(age >= 40 && age <= 59) return 'adult';
+  return null;
+}
+
+function schoolRank(school){
+  if(school === 'Primaria') return 1;
+  if(school === 'Secundaria') return 2;
+  if(school === 'Bachillerato') return 3;
+  if(school === 'Universidad') return 4;
+  if(school === 'Adulto') return 2;
+  return 2;
+}
+
+function getAdaptiveLevel(age, school){
+  const rank = schoolRank(school);
+  if(age <= 11) return 'child';
+  if(rank === 1) return age >= 18 ? 'basic' : 'child';
+  if(rank === 2) return 'teen';
+  if(rank === 3) return age >= 18 ? 'youngAdult' : 'teen';
+  if(rank >= 4) return age >= 40 ? 'adult' : 'youngAdult';
+  return getGroup(age);
+}
+
+function getTheme(group){
+  document.body.className = '';
+  if(group === 'child') document.body.classList.add('child-theme');
+  if(group === 'teen') document.body.classList.add('teen-theme');
+  if(group === 'youngAdult') document.body.classList.add('young-theme');
+  if(group === 'adult' || group === 'basic') document.body.classList.add('adult-theme');
+}
+
+function getTimeLimit(level){
+  if(level === 'basic') return 15;
+  if(level === 'child') return 14;
+  if(level === 'teen') return 12;
+  if(level === 'youngAdult') return 11;
+  if(level === 'adult') return 13;
+  return 12;
+}
+
+function groupName(group){
+  if(group === 'child') return 'Niños 7-11 años';
+  if(group === 'teen') return 'Adolescentes 12-17 años';
+  if(group === 'youngAdult') return 'Jóvenes adultos 18-39 años';
+  if(group === 'adult') return 'Adultos 40-59 años';
+  return 'Rango no válido';
+}
+
+function levelName(level){
+  if(level === 'basic') return 'Básico funcional';
+  if(level === 'child') return 'Inicial infantil';
+  if(level === 'teen') return 'Escolar medio';
+  if(level === 'youngAdult') return 'Académico / universitario';
+  if(level === 'adult') return 'Adulto funcional';
+  return 'Adaptativo';
+}
+
+function startIntro(){
+  const name = document.getElementById('name').value.trim() || 'Usuario';
+  const age = parseInt(document.getElementById('age').value);
+  const gender = document.getElementById('gender').value || 'No especificado';
+  const school = document.getElementById('school').value || 'No especificado';
+
+  if(!age || age < 7 || age > 59){
+    alert('Edad fuera del rango de estudio. Este sistema únicamente evalúa personas entre 7 y 59 años.');
+    return;
+  }
+
+  const group = getGroup(age);
+  const adaptiveLevel = getAdaptiveLevel(age, school);
+  user = {name, age, gender, school, group, adaptiveLevel};
+  currentBank = randomSample(banks[adaptiveLevel] || banks[group], QUESTION_COUNT);
+  timeLimit = getTimeLimit(adaptiveLevel);
+  getTheme(group);
+
+  document.getElementById('introTitle').textContent = 'Evaluación para rango: ' + groupName(group);
+  document.getElementById('introText').textContent =
+    `${name}, la prueba se ajustó por edad y escolaridad. Nivel aplicado: ${levelName(adaptiveLevel)}. Se mostrarán ${currentBank.length} palabras aleatorias y tendrás ${timeLimit} segundos por palabra.`;
+
+  goTo('introScreen');
+}
+
+function startTest(){
+  index = 0;
+  correct = 0;
+  errors = 0;
+  timeouts = 0;
+  results = [];
+  document.getElementById('total').textContent = currentBank.length;
+  document.getElementById('userInfo').textContent = `${user.name} | ${user.age} años | ${groupName(user.group)} | ${levelName(user.adaptiveLevel)}`;
+  document.getElementById('levelText').textContent = `Perfil: ${groupName(user.group)} | Dificultad: ${levelName(user.adaptiveLevel)} | Tiempo límite: ${timeLimit} segundos`;
+  goTo('testScreen');
+  loadQuestion();
+}
+
+function shuffleOptions(array){
+  const arr = [...array];
+  for(let i = arr.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function loadQuestion(){
+  clearInterval(timerInterval);
+
+  if(index >= currentBank.length){
+    startReadingStage();
+    return;
+  }
+
+  const q = currentBank[index];
+  document.getElementById('current').textContent = index + 1;
+  document.getElementById('bar').style.width = `${(index / currentBank.length) * 100}%`;
+  document.getElementById('word').textContent = q.wrong;
+
+  const title = document.querySelector('#testScreen h2');
+  title.textContent = q.type === 'leer' ? 'Selecciona la palabra escrita correctamente' : 'Ordena mentalmente la palabra y selecciona la correcta';
+
+  const imageSupport = document.getElementById('imageSupport');
+  imageSupport.innerHTML = '';
+  if(user.group === 'child' && q.image){
+    imageSupport.style.display = 'grid';
+    imageSupport.innerHTML = `
+      <div class="image-card"><span class="emoji">${q.image}</span>Apoyo visual</div>
+      <div class="image-card"><span class="emoji">👀</span>Observa</div>
+      <div class="image-card"><span class="emoji">✍️</span>Elige</div>`;
+  } else {
+    imageSupport.style.display = 'none';
+  }
+
+  const options = document.getElementById('options');
+  options.innerHTML = '';
+  shuffleOptions(q.options).forEach((opt, optionIndex) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.textContent = opt;
+    btn.onclick = () => answer(opt, optionIndex + 1);
+    options.appendChild(btn);
+  });
+
+  timeLeft = timeLimit;
+  questionStart = Date.now();
+  document.getElementById('timer').textContent = timeLeft;
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    document.getElementById('timer').textContent = timeLeft;
+    if(timeLeft <= 0){
+      clearInterval(timerInterval);
+      answer(null, null);
+    }
+  }, 1000);
+}
+
+function answer(selected, optionPosition = null){
+  clearInterval(timerInterval);
+  const q = currentBank[index];
+  const elapsed = ((Date.now() - questionStart) / 1000).toFixed(1);
+  let status = '';
+
+  if(selected === null){
+    timeouts++;
+    status = 'Sin responder';
+  } else if(selected === q.correct){
+    correct++;
+    status = 'Correcta';
+  } else {
+    errors++;
+    status = 'Error';
+  }
+
+  results.push({
+    number:index + 1,
+    shown:q.wrong,
+    correct:q.correct,
+    selected:selected || 'Sin respuesta',
+    optionPosition: optionPosition || 'Sin respuesta',
+    time:elapsed,
+    status,
+    type:q.type || 'ordenar'
+  });
+
+  index++;
+  setTimeout(loadQuestion, 250);
+}
+
+function startReadingStage(){
+  clearInterval(timerInterval);
+  const bank = readingBanks[user.adaptiveLevel] || readingBanks[user.group];
+  selectedReadingData = randomItem(bank);
+
+  readingResults = {
+    correctionCorrect: 0,
+    correctionErrors: 0,
+    comprehensionCorrect: 0,
+    comprehensionErrors: 0,
+    readingStart: Date.now(),
+    correctionTime: 0,
+    fullTextCorrect: false
+  };
+
+  document.getElementById('readingInstruction').textContent =
+    'Lee el texto con atención. Corrige directamente dentro del texto las palabras que consideres incorrectas. Después responderás preguntas de comprensión.';
+
+  const readingImageSupport = document.getElementById('readingImageSupport');
+  readingImageSupport.innerHTML = '';
+  if(user.group === 'child'){
+    readingImageSupport.style.display = 'grid';
+    readingImageSupport.innerHTML = `
+      <div class="image-card"><span class="emoji">🏫</span>Lee</div>
+      <div class="image-card"><span class="emoji">📘</span>Corrige</div>
+      <div class="image-card"><span class="emoji">🏠</span>Comprende</div>`;
+  } else {
+    readingImageSupport.style.display = 'none';
+  }
+
+  document.getElementById('readingText').textContent = selectedReadingData.text;
+  goTo('readingScreen');
+}
+
+function normalizeText(value){
+  return value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+}
+
+function checkCorrections(){
+  const data = selectedReadingData;
+  readingResults.correctionTime = ((Date.now() - readingResults.readingStart) / 1000).toFixed(1);
+  const editedText = document.getElementById('readingText').innerText;
+
+  if(data.wrongWords.length === 0){
+    readingResults.correctionCorrect = 1;
+    readingResults.correctionErrors = 0;
+  } else {
+    data.wrongWords.forEach((item) => {
+      const edited = normalizeText(editedText);
+      const correctWord = normalizeText(item.correct);
+      const wrongWord = normalizeText(item.wrong);
+      if(edited.includes(correctWord) && !edited.includes(wrongWord)){
+        readingResults.correctionCorrect++;
+      } else {
+        readingResults.correctionErrors++;
+      }
+    });
+  }
+
+  readingResults.fullTextCorrect = normalizeText(editedText) === normalizeText(data.correctText);
+  loadReadingQuestions();
+}
+
+function loadReadingQuestions(){
+  const data = selectedReadingData;
+  const box = document.getElementById('readingQuestions');
+  box.innerHTML = '';
+
+  data.questions.forEach((question, i) => {
+    const div = document.createElement('div');
+    div.className = 'question-box';
+    div.innerHTML = `<strong>${i + 1}. ${question.q}</strong>`;
+    shuffleOptions(question.options).forEach(opt => {
+      const label = document.createElement('label');
+      label.style.fontWeight = '400';
+      label.innerHTML = `<input type="radio" name="rq-${i}" value="${opt}" style="width:auto;margin-right:8px">${opt}`;
+      div.appendChild(label);
+    });
+    box.appendChild(div);
+  });
+
+  goTo('questionsScreen');
+}
+
+function checkReadingQuestions(){
+  const data = selectedReadingData;
+  readingResults.comprehensionCorrect = 0;
+  readingResults.comprehensionErrors = 0;
+
+  data.questions.forEach((question, i) => {
+    const selected = document.querySelector(`input[name="rq-${i}"]:checked`);
+    if(selected && selected.value === question.correct){
+      readingResults.comprehensionCorrect++;
+    } else {
+      readingResults.comprehensionErrors++;
+    }
+  });
+
+  showResults();
+}
+
+function percentProblem(errorsCount, totalCount){
+  if(totalCount <= 0) return 0;
+  return Math.round((errorsCount / totalCount) * 100);
+}
+
+function percentGood(correctCount, totalCount){
+  if(totalCount <= 0) return 100;
+  return Math.round((correctCount / totalCount) * 100);
+}
+
+function getRisk(difficulty){
+  if(difficulty <= 25) return {risk:'Bajo', cls:'risk-bajo'};
+  if(difficulty <= 60) return {risk:'Medio', cls:'risk-medio'};
+  return {risk:'Alto', cls:'risk-alto'};
+}
+
+function buildRecommendations(sectionProblems, risk){
+  const sorted = Object.entries(sectionProblems).sort((a,b)=>b[1]-a[1]);
+  const main = sorted[0][0];
+  let intro = '';
+  if(risk === 'Bajo') intro = 'Mantener práctica constante para conservar el avance y evitar que aumenten las dificultades lectoras.';
+  else if(risk === 'Medio') intro = 'Reforzar las áreas con más error mediante ejercicios cortos y repetidos. La meta es mejorar precisión y confianza.';
+  else intro = 'Se recomienda acompañamiento de un especialista si las dificultades afectan escuela, trabajo o actividades diarias. Estos ejercicios son de apoyo, no diagnóstico médico.';
+
+  const exercises = [];
+  if(main === 'palabras' || sectionProblems.palabras >= 30){
+    exercises.push('Ordenar 10 palabras al día: mezclar letras y reconstruirlas primero en voz alta y luego por escrito.');
+    exercises.push('Comparar pares parecidos: dirección/direccón, medicamento/medciamento, programa/porgrama.');
+  }
+  if(main === 'tiempo' || sectionProblems.tiempo >= 30){
+    exercises.push('Lectura cronometrada suave: leer 5 minutos diarios sin buscar velocidad al inicio; después repetir el mismo texto y comparar mejora.');
+    exercises.push('Usar pausas por sílabas en palabras largas: do-cu-men-ta-ción, re-co-men-da-ción, pro-ce-di-mien-to.');
+  }
+  if(main === 'correccion' || sectionProblems.correccion >= 30){
+    exercises.push('Corrección visual: leer un párrafo y subrayar 3 palabras que “se vean raras”; después escribir la forma correcta.');
+    exercises.push('Crear una lista personal de errores frecuentes y repasarla antes de leer documentos importantes.');
+  }
+  if(main === 'comprension' || sectionProblems.comprension >= 30){
+    exercises.push('Después de leer, contestar tres preguntas: ¿quién?, ¿qué pasó?, ¿para qué?');
+    exercises.push('Resumir cada texto en una frase corta para confirmar que se entendió la idea principal.');
+  }
+
+  exercises.push('Usar letra clara y espaciada, evitar distracciones y leer en bloques pequeños.');
+  exercises.push('Repetir esta evaluación después de varios días de práctica para comparar avance por secciones.');
+
+  return {intro, exercises:[...new Set(exercises)]};
+}
+
+
+const supportExerciseBank = {
+  palabras: [
+    {mixed:'RCEETA', correct:'RECETA'}, {mixed:'DREICCIÓN', correct:'DIRECCIÓN'}, {mixed:'MDEICAMENTO', correct:'MEDICAMENTO'},
+    {mixed:'HROARIO', correct:'HORARIO'}, {mixed:'DOUCMENTO', correct:'DOCUMENTO'}, {mixed:'PRGORAMA', correct:'PROGRAMA'},
+    {mixed:'INFORMCAIÓN', correct:'INFORMACIÓN'}, {mixed:'ORAGNIZACIÓN', correct:'ORGANIZACIÓN'}, {mixed:'BIBLOITECA', correct:'BIBLIOTECA'},
+    {mixed:'CLENDARIO', correct:'CALENDARIO'}, {mixed:'CONSULTROIO', correct:'CONSULTORIO'}, {mixed:'COMUNCIACIÓN', correct:'COMUNICACIÓN'}
+  ],
+  lectura: [
+    'Lee este texto dos veces: La lectura diaria ayuda a reconocer palabras con más seguridad. Al repetir el texto, la persona puede notar menos errores y mejorar su ritmo.',
+    'Lee con calma: Antes de firmar un documento, revisa el nombre, la fecha, la dirección y las instrucciones. Si una palabra parece extraña, léela por partes.',
+    'Lee este párrafo: En la escuela y en el trabajo es útil leer por bloques pequeños, hacer pausas y confirmar la idea principal antes de continuar.'
+  ],
+  correccion: [
+    {text:'El paciente revisó su medciamento y la direccón del consultorio.', answers:['medicamento','dirección']},
+    {text:'María entregó el porgrama con informaicón incompleta.', answers:['programa','información']},
+    {text:'El alumno guardó la documentaicón y revisó el horairo.', answers:['documentación','horario']}
+  ],
+  comprension: [
+    {text:'Laura leyó las instrucciones antes de llenar el formato. Primero escribió su nombre, después revisó la fecha y al final firmó el documento.', q:'¿Qué hizo Laura al final?', options:['Firmó el documento','Compró un libro','Cambió la fecha'], correct:'Firmó el documento'},
+    {text:'Don Miguel tomó su medicamento después del desayuno. Guardó la receta en una carpeta para enseñarla en su próxima consulta.', q:'¿Dónde guardó la receta?', options:['En una carpeta','En una mochila','En el banco'], correct:'En una carpeta'},
+    {text:'Carlos corrigió tres palabras del texto y luego explicó la idea principal con una frase corta.', q:'¿Qué hizo después de corregir?', options:['Explicó la idea principal','Salió a correr','Borró el texto'], correct:'Explicó la idea principal'}
+  ]
+};
+
+function resetSupportExercises(){
+  renderSupportExercises(true);
+}
+
+function openRecommendations(){
+  if(!lastSectionProblems){
+    alert('Primero finaliza una evaluación para generar ejercicios personalizados.');
+    return;
+  }
+  document.getElementById('supportIntro').textContent = lastRecommendations.intro + ' Los ejercicios se muestran según las secciones donde hubo más dificultad.';
+  renderSupportSections();
+  renderSupportExercises(false);
+  goTo('supportScreen');
+}
+
+function renderSupportSections(){
+  const names = {palabras:'Ordenamiento y lectura de palabras', tiempo:'Ritmo / tiempo de respuesta', correccion:'Corrección visual de texto', comprension:'Comprensión lectora'};
+  const box = document.getElementById('supportSections');
+  box.innerHTML = '<h3>Áreas detectadas</h3>' + Object.entries(lastSectionProblems).map(([key,value]) => `
+    <div class="section-score">
+      <span><strong>${names[key]}</strong><br><span class="small">Dificultad estimada en esta sección.</span></span>
+      <strong>${value}%</strong>
+    </div>
+  `).join('');
+}
+
+function getPrioritySections(){
+  const entries = Object.entries(lastSectionProblems || {}).sort((a,b)=>b[1]-a[1]);
+  let selected = entries.filter(([k,v]) => v >= 30).map(([k])=>k);
+  if(selected.length === 0 && entries.length) selected = [entries[0][0]];
+  if(!selected.includes('palabras')) selected.push('palabras');
+  return [...new Set(selected)];
+}
+
+function renderSupportExercises(forceNew){
+  const box = document.getElementById('supportExercises');
+  const priorities = getPrioritySections();
+  supportStartedAt = Date.now();
+  let html = '<h3>Ejercicios para realizar aquí mismo</h3>';
+
+  if(priorities.includes('palabras')){
+    const words = pickRandom(supportExerciseBank.palabras, 5);
+    html += `<div class="support-panel" data-exercise="palabras"><h3>1. Ordena las palabras</h3><p>Escribe la palabra correcta. Hazlo con calma, primero observa las letras y luego ordénalas.</p>`;
+    words.forEach((w,i)=>{
+      html += `<div class="exercise-item"><strong>${i+1}. ${w.mixed}</strong><input data-answer="${w.correct}" placeholder="Escribe la palabra ordenada"></div>`;
+    });
+    html += `<button class="mini-btn" onclick="checkWordSupport(this)">Revisar palabras</button><p class="feedback"></p></div>`;
+  }
+
+  if(priorities.includes('tiempo')){
+    const text = randomItem(supportExerciseBank.lectura);
+    html += `<div class="support-panel" data-exercise="tiempo"><h3>2. Lectura guiada</h3><p>Lee el texto una vez con calma. Después presiona iniciar y vuelve a leerlo. No importa ir rápido; importa leer claro.</p><div class="reading-text" style="min-height:auto" contenteditable="false">${text}</div><div class="exercise-actions"><button class="mini-btn" onclick="startReadingPractice(this)">Iniciar tiempo</button><button class="mini-btn secondary" onclick="finishReadingPractice(this)">Terminé de leer</button></div><p class="feedback"></p></div>`;
+  }
+
+  if(priorities.includes('correccion')){
+    const item = randomItem(supportExerciseBank.correccion);
+    html += `<div class="support-panel" data-exercise="correccion"><h3>3. Corrige el texto</h3><p>Corrige directamente las palabras que estén mal escritas.</p><div class="reading-text" contenteditable="true" spellcheck="false" data-answers="${item.answers.join('|')}">${item.text}</div><button class="mini-btn" onclick="checkCorrectionSupport(this)">Revisar corrección</button><p class="feedback"></p></div>`;
+  }
+
+  if(priorities.includes('comprension')){
+    const item = randomItem(supportExerciseBank.comprension);
+    html += `<div class="support-panel" data-exercise="comprension"><h3>4. Comprensión lectora</h3><p>${item.text}</p><strong>${item.q}</strong>`;
+    shuffleOptions(item.options).forEach(opt => {
+      html += `<label style="font-weight:400"><input type="radio" name="supportComp" value="${opt}" style="width:auto;margin-right:8px"> ${opt}</label>`;
+    });
+    html += `<button class="mini-btn" data-answer="${item.correct}" onclick="checkComprehensionSupport(this)">Revisar comprensión</button><p class="feedback"></p></div>`;
+  }
+
+  html += `<div class="result-box"><strong>Recomendación final:</strong><p>Realiza estos ejercicios diariamente. Si el resultado de la evaluación fue medio o alto, conviene pedir apoyo de un docente, terapeuta de lenguaje, psicopedagogo o especialista en lectura.</p></div>`;
+  box.innerHTML = html;
+}
+
+function normalizeSupport(value){
+  return normalizeText(value || '').replace(/[.,;:¿?¡!]/g,'').replace(/\s+/g,' ');
+}
+
+function checkWordSupport(button){
+  const panel = button.closest('.support-panel');
+  const inputs = panel.querySelectorAll('input[data-answer]');
+  let ok = 0;
+  inputs.forEach(input => {
+    const isOk = normalizeSupport(input.value) === normalizeSupport(input.dataset.answer);
+    if(isOk) ok++;
+    input.style.borderColor = isOk ? 'var(--success)' : 'var(--danger)';
+  });
+  panel.querySelector('.feedback').textContent = `Resultado: ${ok} de ${inputs.length}. ${ok === inputs.length ? 'Muy bien, mantén la práctica diaria.' : 'Revisa las marcadas en rojo y vuelve a intentarlo.'}`;
+}
+
+function startReadingPractice(button){
+  const panel = button.closest('.support-panel');
+  panel.dataset.started = Date.now();
+  panel.querySelector('.feedback').textContent = 'Tiempo iniciado. Lee con calma y presiona “Terminé de leer”.';
+}
+
+function finishReadingPractice(button){
+  const panel = button.closest('.support-panel');
+  if(!panel.dataset.started){
+    panel.querySelector('.feedback').textContent = 'Primero presiona “Iniciar tiempo”.';
+    return;
+  }
+  const seconds = ((Date.now() - Number(panel.dataset.started)) / 1000).toFixed(1);
+  panel.querySelector('.feedback').textContent = `Tiempo de lectura: ${seconds} segundos. Repite el mismo texto mañana e intenta leerlo con más seguridad, no sólo con más velocidad.`;
+}
+
+function checkCorrectionSupport(button){
+  const panel = button.closest('.support-panel');
+  const area = panel.querySelector('.reading-text');
+  const answers = area.dataset.answers.split('|');
+  const text = normalizeSupport(area.innerText);
+  const ok = answers.filter(ans => text.includes(normalizeSupport(ans))).length;
+  panel.querySelector('.feedback').textContent = `Correcciones encontradas: ${ok} de ${answers.length}. ${ok === answers.length ? 'Excelente corrección visual.' : 'Vuelve a revisar las palabras alteradas.'}`;
+}
+
+function checkComprehensionSupport(button){
+  const panel = button.closest('.support-panel');
+  const selected = panel.querySelector('input[name="supportComp"]:checked');
+  if(!selected){
+    panel.querySelector('.feedback').textContent = 'Selecciona una respuesta.';
+    return;
+  }
+  const ok = selected.value === button.dataset.answer;
+  panel.querySelector('.feedback').textContent = ok ? 'Correcto. Comprendiste la idea principal.' : 'Respuesta incorrecta. Vuelve a leer el texto y busca la acción principal.';
+}
+
+function markDailyDone(){
+  const checks = document.querySelectorAll('#supportScreen .daily-checklist input[type="checkbox"]');
+  const done = [...checks].filter(c => c.checked).length;
+  const msg = done === checks.length
+    ? 'Práctica completa por hoy. Guarda tus palabras difíciles y repite mañana.'
+    : `Llevas ${done} de ${checks.length}. Completa la rutina para reforzar el avance diario.`;
+  document.getElementById('dailyFeedback').textContent = msg;
+}
+
+
+/* ===== VERSIÓN MEJORADA: Página de apoyo personalizada =====
+   Esta sección reemplaza la lógica anterior de recomendaciones para que el botón abra
+   una pantalla completa con ejercicios diferentes según porcentaje, edad y escolaridad. */
+function getDifficultyFromResult(){
+  const value = Number(document.getElementById('difficultyPercent')?.textContent || lastDifficulty || 0);
+  return Number.isFinite(value) ? value : 0;
+}
+
+function getAcademicLevel(){
+  const school = (user.school || '').toLowerCase();
+  if(school.includes('primaria')) return 'basico';
+  if(school.includes('secundaria')) return 'basico';
+  if(school.includes('bachillerato')) return 'intermedio';
+  if(school.includes('universidad')) return 'avanzado';
+  if(user.age >= 40) return 'basico';
+  return 'intermedio';
+}
+
+function getSupportPlan(){
+  const difficulty = getDifficultyFromResult();
+  const level = getAcademicLevel();
+  const group = user.group || 'adult';
+  let grade = 'mantenimiento';
+  let title = 'Plan de mantenimiento lector';
+  let minutes = '8 a 10 minutos diarios';
+  let goal = 'Mantener la condición lectora y evitar que aumenten errores por falta de práctica.';
+
+  if(difficulty > 25 && difficulty <= 60){
+    grade = 'refuerzo';
+    title = 'Plan de refuerzo lector';
+    minutes = '10 a 15 minutos diarios';
+    goal = 'Reducir errores frecuentes, mejorar seguridad al leer y reforzar las áreas con mayor dificultad.';
+  }
+  if(difficulty > 60){
+    grade = 'apoyo_intensivo';
+    title = 'Plan de apoyo intensivo';
+    minutes = '15 a 20 minutos diarios';
+    goal = 'Practicar de forma guiada y constante. Si la dificultad afecta escuela, trabajo o vida diaria, conviene apoyo profesional.';
+  }
+
+  return {difficulty, level, group, grade, title, minutes, goal};
+}
+
+const adaptiveSupportBank = {
+  basico: {
+    palabras: [
+      ['CSAA','CASA'], ['LBRIO','LIBRO'], ['MSESA','MESA'], ['ESCUELA','ESCUELA'], ['TLÉEFONO','TELÉFONO'],
+      ['RECEAT','RECETA'], ['HROARIO','HORARIO'], ['PAPLE','PAPEL'], ['FAMILAIR','FAMILIAR'], ['CALNEADRIO','CALENDARIO']
+    ],
+    lectura: [
+      'Lee despacio: Ana revisó la fecha, la hora y el lugar de su cita. Después guardó el papel en una carpeta para no olvidarlo.',
+      'Lee con calma: Don Luis tomó su medicamento después de desayunar. Luego marcó el horario en su calendario.',
+      'Lee dos veces: La maestra pidió leer el texto, subrayar la idea principal y escribir una oración corta.'
+    ],
+    correccion: [
+      {text:'Don Luis revisó su medciamento y el horairo de la receta.', answers:['medicamento','horario']},
+      {text:'Ana guardó el libor en su csa antes de ir a la escuela.', answers:['libro','casa']},
+      {text:'La enfermera escribió la direccón y la fecha de consulta.', answers:['dirección']}
+    ],
+    comprension: [
+      {text:'Pedro fue al consultorio. Llevó su receta y preguntó por el horario de su medicamento.', q:'¿Qué llevó Pedro?', options:['Su receta','Una pelota','Una mochila vacía'], correct:'Su receta'},
+      {text:'Laura leyó una nota de la escuela. La nota decía que debía entregar un libro el lunes.', q:'¿Qué debía entregar?', options:['Un libro','Una receta','Un teléfono'], correct:'Un libro'}
+    ],
+    dictado: ['casa','libro','receta','horario','teléfono']
+  },
+  intermedio: {
+    palabras: [
+      ['BIBLOTECA','BIBLIOTECA'], ['INFORMCAIÓN','INFORMACIÓN'], ['PORGRAMA','PROGRAMA'], ['DOCUMENTAICÓN','DOCUMENTACIÓN'], ['COMUNCIACIÓN','COMUNICACIÓN'],
+      ['ORAGNIZACIÓN','ORGANIZACIÓN'], ['DIRECCÓN','DIRECCIÓN'], ['CALENDRAIO','CALENDARIO'], ['INSTRUCCIOENS','INSTRUCCIONES'], ['RECOMENDAICÓN','RECOMENDACIÓN']
+    ],
+    lectura: [
+      'Lee el texto: Carlos buscó información en la biblioteca, corrigió su programa y explicó el procedimiento antes de entregarlo.',
+      'Lee con atención: Antes de firmar un documento, revisa datos personales, fechas, dirección y recomendaciones importantes.',
+      'Lee y resume: La práctica diaria ayuda a reconocer palabras, disminuir confusiones y mejorar la comprensión lectora.'
+    ],
+    correccion: [
+      {text:'Carlos entregó un porgrama con informaicón incompleta.', answers:['programa','información']},
+      {text:'La documentaicón tenía una direccón incorrecta.', answers:['documentación','dirección']},
+      {text:'El alumno revisó las instruccioens y corrigió la recomendaicón.', answers:['instrucciones','recomendación']}
+    ],
+    comprension: [
+      {text:'Mariana revisó un documento, detectó errores de comunicación y propuso organizar mejor el trabajo.', q:'¿Qué propuso Mariana?', options:['Organizar mejor el trabajo','Cambiar de escuela','Borrar el documento'], correct:'Organizar mejor el trabajo'},
+      {text:'Carlos corrigió su programa antes de enviarlo. También explicó el procedimiento a su maestra.', q:'¿Qué hizo antes de enviarlo?', options:['Lo corrigió','Lo imprimió sin leer','Lo rompió'], correct:'Lo corrigió'}
+    ],
+    dictado: ['información','programa','dirección','documentación','recomendación']
+  },
+  avanzado: {
+    palabras: [
+      ['INTERPRETCAIÓN','INTERPRETACIÓN'], ['RESPONSABILDAD','RESPONSABILIDAD'], ['ADMINISTRAICÓN','ADMINISTRACIÓN'], ['CONCENTRAICÓN','CONCENTRACIÓN'], ['PROCESAMEINTO','PROCESAMIENTO'],
+      ['RECONOCIMEINTO','RECONOCIMIENTO'], ['EVALAUCIÓN','EVALUACIÓN'], ['RETROALIMENTAICÓN','RETROALIMENTACIÓN'], ['ARGUMETNACIÓN','ARGUMENTACIÓN'], ['METODOLOGÍA','METODOLOGÍA']
+    ],
+    lectura: [
+      'Lee con atención: La evaluación permite observar patrones de error, tiempo de respuesta y comprensión para orientar ejercicios de apoyo lector.',
+      'Lee y analiza: Una estrategia útil consiste en dividir palabras largas por sílabas, confirmar su significado y usarlas dentro de una oración.',
+      'Lee dos veces: La retroalimentación constante ayuda a reconocer errores, mejorar precisión y fortalecer la autonomía del usuario.'
+    ],
+    correccion: [
+      {text:'La administraicón revisó el procesameinto y la evalaución del sistema.', answers:['administración','procesamiento','evaluación']},
+      {text:'El usuario recibió retroalimentaicón sobre su interpretaicón del texto.', answers:['retroalimentación','interpretación']},
+      {text:'La concentraicón y el reconocimeinto de palabras mejoran con práctica diaria.', answers:['concentración','reconocimiento']}
+    ],
+    comprension: [
+      {text:'El sistema separa los resultados por secciones para identificar si la mayor dificultad aparece en palabras, corrección o comprensión.', q:'¿Para qué separa los resultados?', options:['Para identificar el área con mayor dificultad','Para eliminar la evaluación','Para cambiar el nombre'], correct:'Para identificar el área con mayor dificultad'},
+      {text:'La práctica diaria no sustituye a un especialista, pero ayuda a reforzar habilidades lectoras y a observar avances.', q:'¿Qué ayuda a reforzar?', options:['Habilidades lectoras','El color del logo','El sonido del equipo'], correct:'Habilidades lectoras'}
+    ],
+    dictado: ['interpretación','responsabilidad','administración','concentración','procesamiento']
+  }
+};
+
+function openRecommendations(){
+  if(!lastSectionProblems){
+    alert('Primero finaliza una evaluación para generar ejercicios personalizados.');
+    return;
+  }
+  const plan = getSupportPlan();
+  const intro = `${plan.title}: resultado estimado ${plan.difficulty}%. Edad: ${user.age} años. Escolaridad: ${user.school || 'No especificada'}. Tiempo sugerido: ${plan.minutes}. ${plan.goal}`;
+  document.getElementById('supportIntro').textContent = intro;
+  renderSupportSections();
+  renderSupportExercises(true);
+  goTo('supportScreen');
+  window.scrollTo(0,0);
+}
+
+function renderSupportSections(){
+  const plan = getSupportPlan();
+  const names = {palabras:'Ordenamiento y lectura de palabras', tiempo:'Ritmo / tiempo de respuesta', correccion:'Corrección visual de texto', comprension:'Comprensión lectora'};
+  const box = document.getElementById('supportSections');
+  const ordered = Object.entries(lastSectionProblems || {}).sort((a,b)=>b[1]-a[1]);
+  box.innerHTML = `
+    <h3>Plan personalizado por edad, escolaridad y porcentaje</h3>
+    <div class="support-panel">
+      <p><strong>Nivel del plan:</strong> ${plan.title}</p>
+      <p><strong>Dificultad estimada:</strong> ${plan.difficulty}%</p>
+      <p><strong>Base académica usada:</strong> ${plan.level === 'basico' ? 'Básica' : plan.level === 'intermedio' ? 'Intermedia' : 'Avanzada'}</p>
+      <p><strong>Meta:</strong> ${plan.goal}</p>
+    </div>
+    <h3>Áreas detectadas</h3>
+    ${ordered.map(([key,value]) => `
+      <div class="section-score">
+        <span><strong>${names[key]}</strong><br><span class="small">Mientras más alto el porcentaje, más conviene practicar esta área.</span></span>
+        <strong>${value}%</strong>
+      </div>
+    `).join('')}
+  `;
+}
+
+function renderSupportExercises(forceNew){
+  const box = document.getElementById('supportExercises');
+  const plan = getSupportPlan();
+  const bank = adaptiveSupportBank[plan.level] || adaptiveSupportBank.intermedio;
+  const priorities = getPrioritySections();
+  const wordCount = plan.grade === 'mantenimiento' ? 5 : plan.grade === 'refuerzo' ? 7 : 10;
+  const words = pickRandom(bank.palabras, wordCount);
+  const correctionItems = pickRandom(bank.correccion, plan.grade === 'apoyo_intensivo' ? 2 : 1);
+  const readingText = randomItem(bank.lectura);
+  const comprehensionItems = pickRandom(bank.comprension, plan.grade === 'mantenimiento' ? 1 : 2);
+  const dictado = pickRandom(bank.dictado, plan.grade === 'apoyo_intensivo' ? 5 : 3);
+
+  let html = `<h3>Página de ejercicios de apoyo</h3>
+    <div class="result-box"><strong>Cómo usarla:</strong><p>Realiza los ejercicios aquí mismo. Al terminar, revisa tu resultado. Repite diariamente con el botón “Generar nuevos ejercicios”.</p></div>`;
+
+  html += `<div class="support-panel" data-exercise="palabras"><h3>1. Ordena palabras (${wordCount})</h3><p>Este ejercicio trabaja confusión de letras, inversión y reconocimiento visual. Escribe la palabra correcta.</p>`;
+  words.forEach((w,i)=>{
+    html += `<div class="exercise-item"><strong>${i+1}. ${w[0]}</strong><input data-answer="${w[1]}" placeholder="Escribe la palabra ordenada"></div>`;
+  });
+  html += `<button class="mini-btn" onclick="checkWordSupport(this)">Revisar palabras</button><p class="feedback"></p></div>`;
+
+  html += `<div class="support-panel" data-exercise="tiempo"><h3>2. Lectura guiada por tiempo</h3><p>Lee primero en silencio. Después inicia el tiempo y vuelve a leer en voz alta o mentalmente. La meta es claridad, no velocidad extrema.</p><div class="reading-text" style="min-height:auto" contenteditable="false">${readingText}</div><div class="exercise-actions"><button class="mini-btn" onclick="startReadingPractice(this)">Iniciar tiempo</button><button class="mini-btn secondary" onclick="finishReadingPractice(this)">Terminé de leer</button></div><p class="feedback"></p></div>`;
+
+  correctionItems.forEach((item, idx)=>{
+    html += `<div class="support-panel" data-exercise="correccion"><h3>${idx+3}. Corrige el texto</h3><p>Corrige directamente las palabras mal escritas. Esto ayuda a entrenar atención visual y precisión.</p><div class="reading-text" contenteditable="true" spellcheck="false" data-answers="${item.answers.join('|')}">${item.text}</div><button class="mini-btn" onclick="checkCorrectionSupport(this)">Revisar corrección</button><p class="feedback"></p></div>`;
+  });
+
+  html += `<div class="support-panel" data-exercise="dictado"><h3>Ejercicio de copia y memoria visual</h3><p>Observa cada palabra, léela por partes y escríbela igual. Sirve para reforzar memoria visual de palabras frecuentes.</p>`;
+  dictado.forEach((word,i)=>{
+    html += `<div class="exercise-item"><strong>${i+1}. ${word}</strong><input data-answer="${word}" placeholder="Copia la palabra aquí"></div>`;
+  });
+  html += `<button class="mini-btn" onclick="checkWordSupport(this)">Revisar copia</button><p class="feedback"></p></div>`;
+
+  comprehensionItems.forEach((item, idx)=>{
+    const name = `supportComp_${idx}_${Date.now()}`;
+    html += `<div class="support-panel" data-exercise="comprension"><h3>Comprensión lectora</h3><p>${item.text}</p><strong>${item.q}</strong>`;
+    shuffleOptions(item.options).forEach(opt => {
+      html += `<label style="font-weight:400"><input type="radio" name="${name}" value="${opt}" style="width:auto;margin-right:8px"> ${opt}</label>`;
+    });
+    html += `<button class="mini-btn" data-answer="${item.correct}" onclick="checkComprehensionSupport(this)">Revisar comprensión</button><p class="feedback"></p></div>`;
+  });
+
+  let advice = 'Mantén la práctica diaria para conservar la habilidad lectora.';
+  if(plan.grade === 'refuerzo') advice = 'Practica diariamente y repite las áreas con mayor porcentaje. La meta es bajar los errores poco a poco.';
+  if(plan.grade === 'apoyo_intensivo') advice = 'Además de estos ejercicios, conviene solicitar apoyo de un docente, psicopedagogo, terapeuta de lenguaje o especialista si la dificultad afecta actividades escolares, laborales o personales.';
+  html += `<div class="result-box"><strong>Recomendación final:</strong><p>${advice}</p><p class="small">Este apoyo no diagnostica ni cura la dislexia. Sirve para orientar práctica diaria y evitar que las dificultades lectoras avancen por falta de atención.</p></div>`;
+  box.innerHTML = html;
+}
+
+function checkComprehensionSupport(button){
+  const panel = button.closest('.support-panel');
+  const selected = panel.querySelector('input[type="radio"]:checked');
+  if(!selected){
+    panel.querySelector('.feedback').textContent = 'Selecciona una respuesta.';
+    return;
+  }
+  const ok = selected.value === button.dataset.answer;
+  panel.querySelector('.feedback').textContent = ok ? 'Correcto. Comprendiste la idea principal.' : 'Respuesta incorrecta. Vuelve a leer el texto y busca la idea principal.';
+}
+
+function showResults(){
+  document.getElementById('bar').style.width = '100%';
+
+  const total = currentBank.length;
+  const avg = results.reduce((sum,r) => sum + Number(r.time), 0) / total;
+  const wordErrors = errors + timeouts;
+  const wordProblem = percentProblem(wordErrors, total);
+  const wordGood = percentGood(correct, total);
+  const slowAnswers = results.filter(r => Number(r.time) >= timeLimit * 0.75).length;
+  const timeProblem = percentProblem(slowAnswers, total);
+
+  const correctionTotal = Math.max(selectedReadingData.wrongWords.length, 1);
+  const questionTotal = selectedReadingData.questions.length;
+  const correctionProblem = percentProblem(readingResults.correctionErrors, correctionTotal);
+  const comprehensionProblem = percentProblem(readingResults.comprehensionErrors, questionTotal);
+
+  const difficulty = Math.min(100, Math.round(
+    (wordProblem * 0.35) +
+    (timeProblem * 0.20) +
+    (correctionProblem * 0.25) +
+    (comprehensionProblem * 0.20)
+  ));
+
+  const {risk, cls} = getRisk(difficulty);
+  const sections = {
+    palabras: wordProblem,
+    tiempo: timeProblem,
+    correccion: correctionProblem,
+    comprension: comprehensionProblem
+  };
+  const rec = buildRecommendations(sections, risk);
+  lastSectionProblems = sections;
+  lastRisk = risk;
+  lastDifficulty = difficulty;
+  lastRecommendations = rec;
+
+  document.getElementById('summary').textContent =
+    `${user.name}, esta evaluación revisó ordenamiento y lectura de palabras, tiempo de respuesta, corrección de texto y comprensión lectora. El resultado es orientativo y no sustituye una valoración profesional.`;
+
+  document.getElementById('difficultyPercent').textContent = difficulty;
+  document.getElementById('riskLevel').textContent = risk;
+  document.getElementById('riskLevel').className = cls;
+
+  document.getElementById('corrects').textContent = `${correct} de ${total} (${wordGood}% de precisión)`;
+  document.getElementById('errors').textContent = `${errors} de ${total}`;
+  document.getElementById('timeouts').textContent = `${timeouts} de ${total}`;
+  document.getElementById('avgTime').textContent = `${avg.toFixed(1)} segundos`;
+
+  const extra = document.createElement('div');
+  extra.className = 'result-box';
+  extra.innerHTML = `
+    <h3>Resultado por secciones</h3>
+    <p><strong>Palabras para ordenar / leer:</strong> ${wordProblem}% de dificultad estimada (${correct} correctas de ${total}).</p>
+    <p><strong>Tiempo de respuesta:</strong> ${timeProblem}% de respuestas lentas o al límite.</p>
+    <p><strong>Corrección de texto:</strong> ${correctionProblem}% de dificultad (${readingResults.correctionCorrect} aciertos de ${correctionTotal}).</p>
+    <p><strong>Comprensión lectora:</strong> ${comprehensionProblem}% de dificultad (${readingResults.comprehensionCorrect} aciertos de ${questionTotal}).</p>
+    <p><strong>Tiempo en lectura y corrección:</strong> ${readingResults.correctionTime} segundos.</p>
+    <p><strong>Texto completamente correcto:</strong> ${readingResults.fullTextCorrect ? 'Sí' : 'No'}</p>
+  `;
+
+  const recommendationBox = document.createElement('div');
+  recommendationBox.className = 'result-box';
+  recommendationBox.innerHTML = `
+    <h3>Ejercicios sugeridos para apoyo</h3>
+    <p>${rec.intro}</p>
+    <p>Presiona el botón para abrir una sección de recomendaciones con ejercicios interactivos que puedes realizar aquí mismo y repetir diariamente.</p>
+    <button id="supportBtnBox" class="mini-btn" type="button" onclick="openRecommendations(event)">Ir a ejercicios de apoyo</button>
+    <p class="small">Nota: LexiUPVM no diagnostica dislexia. Sólo orienta con base en los errores observados y propone ejercicios de apoyo.</p>
+  `;
+
+  const oldExtra = document.getElementById('readingExtraResults');
+  if(oldExtra) oldExtra.remove();
+  const oldRec = document.getElementById('recommendationResults');
+  if(oldRec) oldRec.remove();
+
+  extra.id = 'readingExtraResults';
+  recommendationBox.id = 'recommendationResults';
+  const grid = document.getElementById('avgTime').closest('.grid');
+  grid.after(extra);
+  extra.after(recommendationBox);
+
+  const table = document.getElementById('detailTable');
+  table.innerHTML = '';
+  results.forEach(r => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${r.number}</td>
+      <td>${r.shown}</td>
+      <td>${r.correct}</td>
+      <td>${r.selected}</td>
+      <td>${r.optionPosition}</td>
+      <td>${r.time}s</td>
+      <td>${r.status}</td>`;
+    table.appendChild(tr);
+  });
+
+  goTo('resultScreen');
+}
+
+function resetAll(){
+  clearInterval(timerInterval);
+  document.getElementById('name').value = '';
+  document.getElementById('age').value = '';
+  document.getElementById('gender').value = '';
+  document.getElementById('school').value = '';
+  document.body.className = 'adult-theme';
+  goTo('loginScreen');
+}
+
+
+/* ===== CORRECCIÓN FINAL: botón de apoyo funcionando siempre =====
+   Esta versión no bloquea la pantalla aunque falte algún dato interno.
+   Abre la página interna de recomendaciones y genera ejercicios según:
+   porcentaje final, edad, escolaridad y secciones con más dificultad. */
+(function(){
+  function safeNumber(value, fallback){
+    const n = Number(value);
+    return Number.isFinite(n) ? n : fallback;
+  }
+
+  function safeUser(){
+    return window.user || {age: 18, school: 'No especificado', group: 'youngAdult'};
+  }
+
+  function ensureProblems(){
+    if(window.lastSectionProblems && Object.keys(window.lastSectionProblems).length){
+      return window.lastSectionProblems;
+    }
+    const difficulty = safeNumber(document.getElementById('difficultyPercent')?.textContent, 30);
+    return {
+      palabras: difficulty,
+      tiempo: Math.max(10, Math.round(difficulty * 0.75)),
+      correccion: Math.max(10, Math.round(difficulty * 0.85)),
+      comprension: Math.max(10, Math.round(difficulty * 0.65))
+    };
+  }
+
+  function levelBySchoolAndAge(){
+    const u = safeUser();
+    const school = String(u.school || '').toLowerCase();
+    const age = safeNumber(u.age, 18);
+    if(school.includes('primaria')) return 'basico';
+    if(school.includes('secundaria')) return 'basico';
+    if(school.includes('bachillerato')) return 'intermedio';
+    if(school.includes('universidad')) return 'avanzado';
+    if(age <= 11) return 'basico';
+    if(age <= 17) return 'intermedio';
+    if(age >= 40) return 'basico';
+    return 'intermedio';
+  }
+
+  function supportPlanFixed(){
+    const u = safeUser();
+    const difficulty = safeNumber(document.getElementById('difficultyPercent')?.textContent, window.lastDifficulty || 30);
+    const level = levelBySchoolAndAge();
+    let grade = 'mantenimiento';
+    let title = 'Plan de mantenimiento lector';
+    let minutes = '8 a 10 minutos diarios';
+    let goal = 'Mantener la práctica lectora y evitar que aumenten los errores por falta de ejercicio.';
+    if(difficulty > 25 && difficulty <= 60){
+      grade = 'refuerzo';
+      title = 'Plan de refuerzo lector';
+      minutes = '10 a 15 minutos diarios';
+      goal = 'Reforzar las áreas con más errores y mejorar lectura, precisión y comprensión.';
+    }
+    if(difficulty > 60){
+      grade = 'apoyo_intensivo';
+      title = 'Plan de apoyo intensivo';
+      minutes = '15 a 20 minutos diarios';
+      goal = 'Practicar con mayor constancia. Si afecta escuela, trabajo o vida diaria, se recomienda apoyo profesional.';
+    }
+    return {difficulty, level, grade, title, minutes, goal, age: u.age || 'No especificada', school: u.school || 'No especificada'};
+  }
+
+  const fallbackBank = {
+    basico: {
+      palabras: [['CSAA','CASA'],['LBRIO','LIBRO'],['MSESA','MESA'],['TLÉEFONO','TELÉFONO'],['HROARIO','HORARIO'],['PAPLE','PAPEL'],['RECEAT','RECETA'],['FIAMR','FIRMA'],['CALNEADRIO','CALENDARIO'],['FAMILAIR','FAMILIAR']],
+      lectura: ['Ana revisó la fecha, la hora y el lugar de su cita. Después guardó el papel en una carpeta para no olvidarlo.','Don Luis tomó su medicamento después de desayunar. Luego marcó el horario en su calendario.'],
+      correccion: [{text:'Don Luis revisó su medciamento y el horairo de la receta.', answers:['medicamento','horario']},{text:'Ana guardó el libor en su csa antes de ir a la escuela.', answers:['libro','casa']}],
+      comprension: [{text:'Pedro fue al consultorio. Llevó su receta y preguntó por el horario de su medicamento.', q:'¿Qué llevó Pedro?', options:['Su receta','Una pelota','Una mochila vacía'], correct:'Su receta'}],
+      dictado: ['casa','libro','receta','horario','teléfono']
+    },
+    intermedio: {
+      palabras: [['BIBLOTECA','BIBLIOTECA'],['INFORMCAIÓN','INFORMACIÓN'],['PORGRAMA','PROGRAMA'],['DOCUMENTAICÓN','DOCUMENTACIÓN'],['COMUNCIACIÓN','COMUNICACIÓN'],['ORAGNIZACIÓN','ORGANIZACIÓN'],['DIRECCÓN','DIRECCIÓN'],['CALENDRAIO','CALENDARIO'],['INSTRUCCIOENS','INSTRUCCIONES'],['RECOMENDAICÓN','RECOMENDACIÓN']],
+      lectura: ['Carlos buscó información en la biblioteca, corrigió su programa y explicó el procedimiento antes de entregarlo.','Antes de firmar un documento, revisa datos personales, fechas, dirección y recomendaciones importantes.'],
+      correccion: [{text:'Carlos entregó un porgrama con informaicón incompleta.', answers:['programa','información']},{text:'La documentaicón tenía una direccón incorrecta.', answers:['documentación','dirección']}],
+      comprension: [{text:'Mariana revisó un documento, detectó errores de comunicación y propuso organizar mejor el trabajo.', q:'¿Qué propuso Mariana?', options:['Organizar mejor el trabajo','Cambiar de escuela','Borrar el documento'], correct:'Organizar mejor el trabajo'}],
+      dictado: ['información','programa','dirección','documentación','recomendación']
+    },
+    avanzado: {
+      palabras: [['INTERPRETCAIÓN','INTERPRETACIÓN'],['RESPONSABILDAD','RESPONSABILIDAD'],['ADMINISTRAICÓN','ADMINISTRACIÓN'],['CONCENTRAICÓN','CONCENTRACIÓN'],['PROCESAMEINTO','PROCESAMIENTO'],['RECONOCIMEINTO','RECONOCIMIENTO'],['EVALAUCIÓN','EVALUACIÓN'],['RETROALIMENTAICÓN','RETROALIMENTACIÓN'],['ARGUMETNACIÓN','ARGUMENTACIÓN'],['METODOLOGÍA','METODOLOGÍA']],
+      lectura: ['La evaluación permite observar patrones de error, tiempo de respuesta y comprensión para orientar ejercicios de apoyo lector.','Una estrategia útil consiste en dividir palabras largas por sílabas, confirmar su significado y usarlas dentro de una oración.'],
+      correccion: [{text:'La administraicón revisó el procesameinto y la evalaución del sistema.', answers:['administración','procesamiento','evaluación']},{text:'El usuario recibió retroalimentaicón sobre su interpretaicón del texto.', answers:['retroalimentación','interpretación']}],
+      comprension: [{text:'El sistema separa los resultados por secciones para identificar si la mayor dificultad aparece en palabras, corrección o comprensión.', q:'¿Para qué separa los resultados?', options:['Para identificar el área con mayor dificultad','Para eliminar la evaluación','Para cambiar el nombre'], correct:'Para identificar el área con mayor dificultad'}],
+      dictado: ['interpretación','responsabilidad','administración','concentración','procesamiento']
+    }
+  };
+
+  function pick(arr, count){
+    const copy = [...arr].sort(()=>Math.random()-0.5);
+    return copy.slice(0, Math.min(count, copy.length));
+  }
+  function one(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+  function clean(v){ return String(v || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim(); }
+
+  window.openRecommendations = function(event){
+    if(event && event.preventDefault) event.preventDefault();
+    const support = document.getElementById('supportScreen');
+    if(!support){ alert('No se encontró la página de ejercicios.'); return; }
+
+    const plan = supportPlanFixed();
+    const problems = ensureProblems();
+    const names = {palabras:'Ordenamiento y lectura de palabras', tiempo:'Ritmo / tiempo de respuesta', correccion:'Corrección visual de texto', comprension:'Comprensión lectora'};
+    const ordered = Object.entries(problems).sort((a,b)=>b[1]-a[1]);
+
+    document.getElementById('supportIntro').textContent = `${plan.title}. Resultado estimado: ${plan.difficulty}%. Edad: ${plan.age} años. Escolaridad: ${plan.school}. Tiempo sugerido: ${plan.minutes}. ${plan.goal}`;
+
+    const sectionBox = document.getElementById('supportSections');
+    sectionBox.innerHTML = `<h3>Plan personalizado</h3>
+      <div class="support-panel">
+        <p><strong>Nivel usado:</strong> ${plan.level === 'basico' ? 'Básico' : plan.level === 'intermedio' ? 'Intermedio' : 'Avanzado'}</p>
+        <p><strong>Tipo de apoyo:</strong> ${plan.title}</p>
+        <p><strong>Meta:</strong> ${plan.goal}</p>
+      </div>
+      <h3>Porcentaje por área</h3>
+      ${ordered.map(([k,v])=>`<div class="section-score"><span><strong>${names[k] || k}</strong><br><span class="small">Área para practicar diariamente.</span></span><strong>${v}%</strong></div>`).join('')}`;
+
+    window.resetSupportExercises = function(){ renderExercisesFixed(plan); };
+    renderExercisesFixed(plan);
+    if(typeof goTo === 'function') goTo('supportScreen');
+    else {
+      document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+      support.classList.add('active');
+    }
+    setTimeout(()=>window.scrollTo(0,0), 50);
+  };
+
+  function renderExercisesFixed(plan){
+    const bank = fallbackBank[plan.level] || fallbackBank.intermedio;
+    const wordCount = plan.grade === 'mantenimiento' ? 5 : plan.grade === 'refuerzo' ? 7 : 10;
+    const correctionCount = plan.grade === 'apoyo_intensivo' ? 2 : 1;
+    const compCount = plan.grade === 'mantenimiento' ? 1 : 2;
+    const dictadoCount = plan.grade === 'apoyo_intensivo' ? 5 : 3;
+    const words = pick(bank.palabras, wordCount);
+    const correctionItems = pick(bank.correccion, correctionCount);
+    const comprehensionItems = pick(bank.comprension, compCount);
+    const dictado = pick(bank.dictado, dictadoCount);
+    const readingText = one(bank.lectura);
+
+    let html = `<h3>Página de ejercicios de apoyo</h3>
+      <div class="result-box"><strong>Uso diario:</strong><p>Realiza estos ejercicios de 10 a 20 minutos al día. La meta es practicar, no diagnosticar. Puedes generar ejercicios nuevos y repetirlos.</p></div>`;
+
+    html += `<div class="support-panel"><h3>1. Ordena palabras (${wordCount})</h3><p>Escribe la palabra correcta.</p>`;
+    words.forEach((w,i)=>{ html += `<div class="exercise-item"><strong>${i+1}. ${w[0]}</strong><input data-answer="${w[1]}" placeholder="Escribe la palabra ordenada"></div>`; });
+    html += `<button class="mini-btn" type="button" onclick="checkWordSupportFixed(this)">Revisar palabras</button><p class="feedback"></p></div>`;
+
+    html += `<div class="support-panel"><h3>2. Lectura guiada</h3><p>Lee primero en silencio. Luego presiona iniciar, vuelve a leer y termina el tiempo.</p><div class="reading-text" style="min-height:auto" contenteditable="false">${readingText}</div><div class="exercise-actions"><button class="mini-btn" type="button" onclick="startReadingPractice(this)">Iniciar tiempo</button><button class="mini-btn secondary" type="button" onclick="finishReadingPractice(this)">Terminé de leer</button></div><p class="feedback"></p></div>`;
+
+    correctionItems.forEach((item, idx)=>{
+      html += `<div class="support-panel"><h3>${idx+3}. Corrige el texto</h3><p>Corrige directamente las palabras mal escritas.</p><div class="reading-text" contenteditable="true" spellcheck="false" data-answers="${item.answers.join('|')}">${item.text}</div><button class="mini-btn" type="button" onclick="checkCorrectionSupportFixed(this)">Revisar corrección</button><p class="feedback"></p></div>`;
+    });
+
+    html += `<div class="support-panel"><h3>Ejercicio de copia y memoria visual</h3><p>Observa la palabra, léela por partes y cópiala igual.</p>`;
+    dictado.forEach((word,i)=>{ html += `<div class="exercise-item"><strong>${i+1}. ${word}</strong><input data-answer="${word}" placeholder="Copia la palabra aquí"></div>`; });
+    html += `<button class="mini-btn" type="button" onclick="checkWordSupportFixed(this)">Revisar copia</button><p class="feedback"></p></div>`;
+
+    comprehensionItems.forEach((item, idx)=>{
+      const name = `supportFixed_${idx}_${Date.now()}`;
+      html += `<div class="support-panel"><h3>Comprensión lectora</h3><p>${item.text}</p><strong>${item.q}</strong>`;
+      pick(item.options, item.options.length).forEach(opt=>{ html += `<label style="font-weight:400"><input type="radio" name="${name}" value="${opt}" style="width:auto;margin-right:8px"> ${opt}</label>`; });
+      html += `<button class="mini-btn" type="button" data-answer="${item.correct}" onclick="checkComprehensionSupportFixed(this)">Revisar comprensión</button><p class="feedback"></p></div>`;
+    });
+
+    html += `<div class="result-box"><strong>Recomendación final:</strong><p>${plan.grade === 'mantenimiento' ? 'Mantén esta práctica para conservar tu habilidad lectora.' : plan.grade === 'refuerzo' ? 'Repite diariamente las áreas con mayor porcentaje para reducir errores poco a poco.' : 'Además de practicar, considera apoyo de un docente, psicopedagogo o terapeuta de lenguaje si las dificultades afectan actividades diarias.'}</p><p class="small">LexiUPVM no diagnostica ni cura la dislexia. Sólo propone ejercicios de apoyo lector.</p></div>`;
+
+    document.getElementById('supportExercises').innerHTML = html;
+  }
+
+  window.checkWordSupportFixed = function(button){
+    const panel = button.closest('.support-panel');
+    const inputs = panel.querySelectorAll('input[data-answer]');
+    let ok = 0;
+    inputs.forEach(input=>{ if(clean(input.value) === clean(input.dataset.answer)) ok++; });
+    panel.querySelector('.feedback').textContent = `Resultado: ${ok} de ${inputs.length}. ${ok === inputs.length ? 'Muy bien.' : 'Revisa las palabras con calma y vuelve a intentarlo.'}`;
+  };
+
+  window.checkCorrectionSupportFixed = function(button){
+    const panel = button.closest('.support-panel');
+    const text = panel.querySelector('.reading-text');
+    const answers = String(text.dataset.answers || '').split('|').filter(Boolean);
+    const edited = clean(text.innerText);
+    const ok = answers.filter(a=>edited.includes(clean(a))).length;
+    panel.querySelector('.feedback').textContent = `Correcciones encontradas: ${ok} de ${answers.length}. ${ok === answers.length ? 'Excelente.' : 'Vuelve a revisar las palabras alteradas.'}`;
+  };
+
+  window.checkComprehensionSupportFixed = function(button){
+    const panel = button.closest('.support-panel');
+    const selected = panel.querySelector('input[type="radio"]:checked');
+    if(!selected){ panel.querySelector('.feedback').textContent = 'Selecciona una respuesta.'; return; }
+    panel.querySelector('.feedback').textContent = selected.value === button.dataset.answer ? 'Correcto. Comprendiste la idea principal.' : 'Incorrecto. Vuelve a leer el texto y busca la idea principal.';
+  };
+
+  document.addEventListener('DOMContentLoaded', function(){
+    ['supportBtnMain','supportBtnBox'].forEach(id=>{
+      const btn = document.getElementById(id);
+      if(btn) btn.addEventListener('click', window.openRecommendations);
+    });
+  });
+})();
+
+</script>
+
+<!-- ===== LexiBot UPVM v3 - Interfaz de Chat con IA ===== -->
+<button class="lexibot-float" id="lexibotFloat" type="button" title="Abrir LexiBot UPVM">💬</button>
+<div class="lexibot-widget" id="lexibotWidget" aria-live="polite">
+  <div class="lexibot-head">
+    <div><h3>LexiBot UPVM</h3><span>Asistente de apoyo lector con IA</span></div>
+    <button class="lexibot-close" id="lexibotClose" type="button">×</button>
+  </div>
+  <div class="lexibot-messages" id="lexibotMessages">
+    <div class="lexibot-msg bot">Hola, soy LexiBot UPVM. Puedo orientarte sobre LexiUPVM, la evaluación, tus resultados y actividades de apoyo lector. No realizo diagnósticos médicos.</div>
+  </div>
+  <div class="lexibot-tools">
+    <button class="lexibot-tool" type="button" data-q="¿Qué evalúa LexiUPVM?">¿Qué evalúa?</button>
+    <button class="lexibot-tool" type="button" data-q="¿Qué significa mi resultado?">Mi resultado</button>
+    <button class="lexibot-tool" type="button" data-q="Estoy preocupado por mi resultado">Estoy preocupado</button>
+    <button class="lexibot-tool" type="button" data-q="¿Qué actividades puedo realizar?">Actividades</button>
+  </div>
+  <form class="lexibot-input" id="lexibotForm">
+    <input id="lexibotInput" type="text" autocomplete="off" placeholder="Escribe tu duda sobre LexiUPVM..." maxlength="600">
+    <button id="lexibotSend" type="submit">Enviar</button>
+  </form>
+  <div class="lexibot-status" id="lexibotStatus">Memoria activa solo durante esta sesión.</div>
+</div>
+
+<script>
+(function(){
+  const sessionId = 'lexiupvm-' + Date.now() + '-' + Math.random().toString(36).slice(2);
+  const widget = document.getElementById('lexibotWidget');
+  const floatBtn = document.getElementById('lexibotFloat');
+  const closeBtn = document.getElementById('lexibotClose');
+  const form = document.getElementById('lexibotForm');
+  const input = document.getElementById('lexibotInput');
+  const sendBtn = document.getElementById('lexibotSend');
+  const messages = document.getElementById('lexibotMessages');
+  const status = document.getElementById('lexibotStatus');
+
+  function openChat(){ widget.classList.add('open'); setTimeout(()=>input.focus(),80); }
+  function closeChat(){ widget.classList.remove('open'); }
+  floatBtn.addEventListener('click',()=> widget.classList.contains('open') ? closeChat() : openChat());
+  closeBtn.addEventListener('click', closeChat);
+
+  function addMsg(text, who){
+    const div = document.createElement('div');
+    div.className = 'lexibot-msg ' + who;
+    div.textContent = text;
+    messages.appendChild(div);
+    messages.scrollTop = messages.scrollHeight;
+  }
+  function collectProfile(){
+    const risk = document.getElementById('riskLevel')?.textContent || '';
+    const difficulty = document.getElementById('difficultyPercent')?.textContent || '';
+    return {
+      name: (window.user && window.user.name) || document.getElementById('name')?.value || '',
+      age: (window.user && window.user.age) || document.getElementById('age')?.value || '',
+      gender: (window.user && window.user.gender) || document.getElementById('gender')?.value || '',
+      school: (window.user && window.user.school) || document.getElementById('school')?.value || '',
+      group: (window.user && window.user.group) || '',
+      adaptiveLevel: (window.user && window.user.adaptiveLevel) || '',
+      result: risk ? {risk, difficulty, sections: window.lastSectionProblems || null, recommendations: window.lastRecommendations || null} : null
+    };
+  }
+  async function postContext(eventName){
+    try{
+      await fetch('/api/context',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId,event:eventName,context:collectProfile()})});
+    }catch(e){}
+  }
+  async function resetLexiBotSession(){
+    try{ await fetch('/api/reset',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId})}); }catch(e){}
+    messages.innerHTML = '<div class="lexibot-msg bot">Hola, soy LexiBot UPVM. Puedo orientarte sobre LexiUPVM, la evaluación, tus resultados y actividades de apoyo lector. No realizo diagnósticos médicos.</div>';
+  }
+  async function sendMessage(text){
+    if(!text.trim()) return;
+    openChat();
+    addMsg(text,'user');
+    input.value='';
+    sendBtn.disabled=true;
+    status.textContent='LexiBot está escribiendo...';
+    try{
+      const res = await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId,message:text,context:collectProfile()})});
+      const data = await res.json().catch(()=>({}));
+      if(!res.ok) throw new Error(data.error || 'Error de conexión');
+      addMsg(data.reply || 'No cuento con información suficiente para responder esa pregunta.','bot');
+      status.textContent='Memoria activa solo durante esta sesión.';
+    }catch(err){
+      addMsg('No pude conectarme con la IA en este momento. Verifica que el servidor esté activo y que la API Key esté configurada.','bot');
+      status.textContent='Error de conexión con la IA.';
+    }finally{ sendBtn.disabled=false; input.focus(); }
+  }
+  form.addEventListener('submit', e=>{ e.preventDefault(); sendMessage(input.value); });
+  document.querySelectorAll('.lexibot-tool').forEach(b=>b.addEventListener('click',()=>sendMessage(b.dataset.q || b.textContent)));
+
+  function buildReportText(){
+    const ctx = collectProfile();
+    const lines = [];
+    lines.push('Reporte LexiUPVM');
+    lines.push('Fecha: ' + new Date().toLocaleString());
+    lines.push('Nombre: ' + (ctx.name || 'No registrado'));
+    lines.push('Edad: ' + (ctx.age || 'No registrada'));
+    lines.push('Escolaridad: ' + (ctx.school || 'No registrada'));
+    if(ctx.result){
+      lines.push('Nivel estimado: ' + ctx.result.risk);
+      lines.push('Porcentaje estimado de dificultad: ' + ctx.result.difficulty + '%');
+      if(ctx.result.sections){
+        lines.push('Palabras: ' + ctx.result.sections.palabras + '%');
+        lines.push('Tiempo: ' + ctx.result.sections.tiempo + '%');
+        lines.push('Corrección: ' + ctx.result.sections.correccion + '%');
+        lines.push('Comprensión: ' + ctx.result.sections.comprension + '%');
+      }
+    }
+    lines.push('Nota: Este resultado no representa un diagnóstico médico.');
+    return lines.join('\n');
+  }
+  window.printLexiReport = function(){
+    const txt = buildReportText().replace(/\n/g,'<br>');
+    const w = window.open('', '_blank');
+    w.document.write('<html><head><title>Reporte LexiUPVM</title><style>body{font-family:Arial;padding:32px;line-height:1.6}h1{color:#5b1f2d}</style></head><body><h1>Reporte LexiUPVM</h1><p>'+txt+'</p></body></html>');
+    w.document.close(); w.focus(); w.print();
+  };
+  window.emailLexiReport = function(){
+    const subject = encodeURIComponent('Resultado LexiUPVM');
+    const body = encodeURIComponent(buildReportText());
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  };
+  function addResultActions(){
+    const box = document.getElementById('recommendationResults') || document.getElementById('readingExtraResults');
+    if(!box || document.getElementById('lexiResultActions')) return;
+    const div = document.createElement('div');
+    div.id='lexiResultActions'; div.className='result-box';
+    div.innerHTML='<h3>Reporte del resultado</h3><p>Puedes imprimir o guardar el resultado como PDF desde el navegador. También puedes preparar un correo con el resumen.</p><div class="result-actions"><button class="mini-btn" type="button" onclick="printLexiReport()">Imprimir / Guardar PDF</button><button class="mini-btn secondary" type="button" onclick="emailLexiReport()">Preparar correo</button></div><p class="small">El usuario decide si comparte su resultado.</p>';
+    box.after(div);
+  }
+  const originalShow = window.showResults;
+  if(typeof originalShow === 'function'){
+    window.showResults = function(){
+      originalShow.apply(this, arguments);
+      setTimeout(()=>{ postContext('resultado_generado'); addResultActions(); sendMessage('Ya terminé la evaluación. Explícame mi resultado de forma tranquila y personalizada.'); }, 200);
+    };
+  }
+  const originalStartIntro = window.startIntro;
+  if(typeof originalStartIntro === 'function'){
+    window.startIntro = function(){ const r = originalStartIntro.apply(this, arguments); setTimeout(()=>postContext('perfil_registrado'),100); return r; };
+  }
+  const originalReset = window.resetAll;
+  if(typeof originalReset === 'function'){
+    window.resetAll = function(){ resetLexiBotSession(); return originalReset.apply(this, arguments); };
+  }
+})();
+</script>
+
+</body>
+</html>
