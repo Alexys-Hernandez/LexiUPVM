@@ -5,7 +5,7 @@ require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash-lite';
+const MODEL = process.env.GEMINI_MODEL || 'gemini-3.5-flash';
 const API_KEY = process.env.GEMINI_API_KEY || '';
 const PROMPT_PATH = path.join(__dirname, 'prompts', 'lexibot_v3.md');
 const SYSTEM_PROMPT = fs.existsSync(PROMPT_PATH)
